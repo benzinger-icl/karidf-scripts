@@ -65,7 +65,7 @@ Specifically, for the KARI Master Data Freeze CNDA project, use the yntax below 
 ```
 
 
-## Script Output Description
+### Script Output Description
 
 The output directory will be organized as follow:
 ${OUTPUTDIR}/${EXPERIMENT_LABEL}/${SCAN_NAME}/
@@ -131,4 +131,19 @@ python download_freesurfer.py <fs_ids.csv> <site> <destination_dir> -u <alias> -
 <alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
 <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
 
- 
+### Script Output Description
+The files will be organized into the following structure:
+${fs_id}/DATA/atlas (if FS 5.1 or 5.0)
+${fs_id}/DATA/label
+${fs_id}/DATA/mri
+${fs_id}/DATA/scripts
+${fs_id}/DATA/stats
+${fs_id}/DATA/surf
+${fs_id}/DATA/touch
+${fs_id}/DATA/tmp
+${fs_id}/SNAPSHOTS
+${fs_id}/LOG
+
+Creates a log file at `download_fs.log` - contains all output from the script.
+Creates a log file at `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
+Creates a log file at `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
