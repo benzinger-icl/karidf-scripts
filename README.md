@@ -147,3 +147,97 @@ ${fs_id}/LOG
 Creates a log file at `download_fs.log` - contains all output from the script.
 Creates a log file at `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
 Creates a log file at `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
+
+## Download PUP files:
+### Instructions:
+1. Download python 2.7 (script written under this version)
+https://www.python.org/downloads/
+
+2. Make sure the following python packages are installed:
+- argparse
+- datetime
+- csv
+- requests
+- time
+- calendar
+- getpass
+- os
+
+3. Download the karidf-scripts repository.
+
+4. In the download_pup directory, update the download_pup_list.csv with the PUP IDs you want to download.
+- Must be the PUP ID that begins with the accession number (begins with CNDA_).
+- Do not include a header.
+
+Example of csv: 
+||
+|-------------|
+| CNDA_E12345_PUPTIMECOURSE_2017101912345 |
+| CNDA_E57844_PUPTIMECOURSE_2019102112345  |
+| CNDA_E19495_PUPTIMECOURSE_2018112212345  |
+
+
+5. Open the terminal and change your directory to the download_pup folder.
+
+```
+cd /path/to/download_pup
+```
+
+
+6. Run the download_pup.sh script:
+
+General usage:
+```
+python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <secret>
+
+```
+<pup_ids.csv> : a csv of PUP IDs you want to download. The script expects the following columns: PUP_ID (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345). 
+     - Must be the PUP ID that begins with the accession number (begins with CNDA_ or DCA_ or CENTRAL_, etc).
+<site> : the site to download from: https://cnda.wustl.edu
+<destination_dir> : the output directory to download to
+- u <alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
+- p <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
+
+Choose one of these flags to read from a CSV of PUP IDs, or specify a single PUP ID:
+-c filename.csv or 
+--csv filename.csv to read from a CSV of PUP IDs with no header row (specify filename.csv) or
+-i pup_id or --id pup_id to download for a single PUP ID (specify pup_id)
+
+7. Add on optional flags
+Include any of these optional flags to only download particular file types, or include no flags to download the entire set of files:
+
+Include the --create-logs flag to create log files that show the script output and specify which files have been skipped.
+
+--download-4dfp: Download 4dfp files (.4dfp.hdr, .4dfp.ifh, .4dfp.img, .4dfp.img.rec)
+--download-dat: Download .dat files
+--download-info: Download .info files
+--download-logs: Download all log files, in both the LOG folder and DATA folder
+--download-lst: Download .lst files
+--download-mgz: Download .mgz files
+--download-moco: Download .moco files
+--download-nii: Download .nii files
+--download-params: Download .params files
+--download-snaps: Download snapshot files (all files in the SNAPSHOTS folder)
+--download-sub: Download .sub files
+--download-suvr: Download suvr files
+--download-tac: Download tac files
+--download-tb: Download .tb files
+--download-txt: Download .txt files
+--download-no-ext: Download files with no extension
+--download-SUVR4dfp: Download SUVR.4dfp and SUVR_g8.4dfp files
+--download-T10014dfp: Download T1001.4dfp file
+--download-PETFOV: Download PETFOV.4dfp files
+--download-RSFMask: Download RSFMask.4dfp files
+--download-wmparc: Download all files containing "wmparc" in the name
+
+
+### Script Output Description
+Organizes the files into the following folder structure: 
+${pup_id}/DATA
+${pup_id}/SNAPSHOTS
+${pup_id}/LOG
+
+If the --create-logs flag is included:
+Creates a log file at `download_pup.log` - contains all output from the script.
+Creates a log file at `to_download_manually_pup.log` - contains a list of all PUP IDs that could not be found.
+Creates a log file at `to_download_manually_pup_files.log` - contains a list of all files that could not be downloaded and their PUP IDs (in the format pup_id, filename).
