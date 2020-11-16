@@ -2,14 +2,6 @@
 ## Overview
 
 This repository contains scripts to download raw imaging scans, freesurfer files, and PUP files from an XNAT platform (i.e. CNDA). These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
-  
-
-  Table of Contents
-1. [Download raw imaging scans:](#download-scans)
-2. [Download FreeSurfer files](#download-fs)
-
-
-
 
 
 ## Download raw imaging scans:
@@ -86,3 +78,57 @@ A log file will be created named, downloading_log_XXX.log,  that contains the li
 
 ## Download FreeSurfer files:
 ### Instructions:
+1. Download python 2.7 (script written under this version)
+https://www.python.org/downloads/
+
+2. Make sure the following python packages are installed:
+- sys
+- json
+- argparse
+- datetime
+- csv
+- os
+- base64
+- shutil
+- requests
+- time
+- urllib2
+- getpass
+- calendar
+- urllib
+
+3. Download the karidf-scripts repository.
+
+4. In the download_freesurfer directory, update the download_freesurfer_list.csv with the FreeSurfer IDs you want to download.
+- Must be the FS ID that begins with the accession number (begins with CNDA_).
+- Do not include a header.
+
+Example of csv: 
+||
+|-------------|
+| CNDA_E12345_freesurfer_2017101912345 |
+| CNDA_E57844_freesurfer_2019102112345  |
+| CNDA_E19495_freesurfer_2018112212345  |
+
+
+5. Open the terminal and change your directory to the download_freesurfer folder.
+
+```
+cd /path/to/download_freesurfer
+```
+
+
+6. Run the download_freesurfer.sh script:
+
+General usage:
+```
+python download_freesurfer.py <fs_ids.csv> <site> <destination_dir> -u <alias> -p <secret>
+```
+<fs_ids.csv> : a csv of FreeSurfer IDs you want to download with following columns with no header row: Freesurfer ID (e.g. CNDA_E12345_freesurfer_2017101912345). 
+- Must be the FS ID that begins with the accession number (begins with CNDA_).
+<site> : the site to download from: https://cnda.wustl.edu
+<destination_dir> : the output directory for the downloaded FreeSurfers.
+<alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
+<secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
+
+ 
