@@ -1,6 +1,11 @@
-# karidf-scripts
-## Overview
+# Table of Contents
+- [KARI Data Freeze Scripts Overview](#kari-data-freeze-scripts-overview)
 
+
+
+
+
+# KARI Data Freeze Scripts Overview
 This repository contains scripts to download raw imaging scans, freesurfer files, and PUP files from an XNAT platform (i.e. CNDA). These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
 
 
