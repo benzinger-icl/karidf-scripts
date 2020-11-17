@@ -17,11 +17,13 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 This script downloads scans of a specified type and organizes the files. 
 
 <br>
+
 **General Usage:**
 ```
 ./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
 ```
 <br>
+
 **Required inputs:**
 
 `<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
