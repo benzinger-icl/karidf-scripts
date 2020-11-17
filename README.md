@@ -1,5 +1,6 @@
 # Table of Contents
 - [KARI data freeze scripts overview](#kari-data-freeze-scripts-overview)
+- [XNAT Tokens - Please Read](#xnat-tokens---please-read)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 
 
@@ -9,12 +10,13 @@
 This repository contains scripts to download Knight Alzheimer Research Institute (KARI) raw imaging scans, freesurfer files, and PUP files from the XNAT platform, CNDA. These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
 
 
+# XNAT Tokens - Please Read
+
 
 # Downloading MR and PET scan files
-
 ## download_scans/download_scans_by_scan_type.sh 
 
-This script downloads scans of a specified type and organizes the files. 
+This script downloads all or a specificed type of MR and PET. 
 
 <br>
 
@@ -45,7 +47,7 @@ This script downloads scans of a specified type and organizes the files.
 
 scan_to_download.csv example:
 
-|<!-- -->   |
+||
 |-------------|
 | CNDA_E71543 |
 | CNDA_E1594  |
@@ -86,71 +88,70 @@ A log file will be created named, downloading_log_XXX.log,  that contains the li
 
 
 
+# Downloading FreeSurfer files:
+## download_freesurfer/download_freesurfer.py
 
+This script downloads all or a specific type of FreeSurfer files.
 
-## Download raw imaging scans:
-### Instructions:
-1. Download the karidf-scripts repository.
+<br>
 
-2. In the downloads_scans_by_type directory, update the scans_to_download.csv with the list of MR or PET sessions/visits you would like to download imaging scans from.
-- Use the MR/PET Accession # (Typically starts with "CNDA_")
-- Do not include a header.
-
-Example of csv: 
-||
-|-------------|
-| CNDA_E71543 |
-| CNDA_E1594  |
-| CNDA_E2240  |
-| CNDA_E1112  |
-
-2. In the downloads_scans_by_type directory, update the scans_types.csv with all the scan names you need to download.  There are several scan  names listed for T1, T2, DTI, etc. scans so you will need to pull this information from the list of sessions you are interested in.
-- You can combine various scan types together in one list (i.e. T1, FLAIR, DTI, etc)
-- Copy the scan name exactly as written in the MR/PET session (spaces and all)
-- Do not include a header.
-- Note in example below there are multiple scan names for the T1.
-
-Example of csv: 
-||
-|-------------|
-| SAG 3D FSPGR |
-| MPRAGE GRAPPA2  |
-| AX T1  |
-| FLAIR  |
-| DTI  |
-
-Once the two csv files are updated, you are now ready to run the script.
-
-
-3. Open the terminal and change your directory to the download_scans folder.
-
+**General Usage:**
 ```
-cd /path/to/download_scans
+python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias> -p <secret>
 ```
 
+<br>
 
-4. Run the download_scans_by_scan_type.sh script:
+**Required inputs:**
 
-General usage:
-```
-./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
-```
-<input_file.csv> - A Unix formatted, comma-separated file containing the following columns: Experiment ID
-<scan_type_list.csv> - A csv with each row containing one scan type you want to download.
-<directory_name> - A directory path (relative or absolute) to save the scan files to
-<xnat_username> - Your username used for accessing data on the given site (you will be prompted for your password before downloading)
-<site> - the full path to the xnat site you are using, ie. https://cnda.wustl.edu
+`<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
+
+`<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
+
+`<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
+
+`<alias>`: Obtain alias token from https://cnda.wustl.edu/data/services/tokens/issue.
   
+`<secret>`: Obtain secret token from https://cnda.wustl.edu/data/services/tokens/issue
 
+ <br>
+ 
+**Example Usage**
 
+1. Create a csv containing FreeSurfer IDs without a header.
 
-### Script Output Description
+download_freesurfer_list.csv example:
 
-The output directory will be organized as follow:
-${OUTPUTDIR}/${EXPERIMENT_LABEL}/${SCAN_NAME}/
+||
+|-------------|
+| CNDA_E12345_freesurfer_2017101912345 |
+| CNDA_E57844_freesurfer_2019102112345  |
+| CNDA_E19495_freesurfer_2018112212345  |
 
+2. Run download_scans_by_scan_type.sh script
+
+The command below is an example of downloading FreeSurfer files from the KARI Master Data Freeze CNDA project 
+where out_dir is your output directory path and your alias_token and secret_token are found from https://cnda.wustl.edu/data/services/tokens/issue
+```
+./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir -u ALIAS_TOKEN -p SECRET_TOKEN
+```
+<br>
+
+**Script output**
+
+This script organizes the files into folders like this:
+
+```
+directory_name/experiment_id/scan_type/
+```
 
 A log file will be created named, downloading_log_XXX.log,  that contains the list of scans downloaded.
+
+
+
+
+
+
 
 
 
