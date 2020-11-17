@@ -323,25 +323,45 @@ Include any of the following optional flags to only download particular filetype
 
 
 `--download-4dfp` Download 4dfp files (.4dfp.hdr, .4dfp.ifh, .4dfp.img, .4dfp.img.rec)
+
 `--download-dat` Download .dat files
+
 `--download-info` Download .info files
+
 `--download-logs` Download all log files, in both the LOG folder and DATA folder
+
 `--download-lst` Download .lst files
+
 `--download-mgz` Download .mgz files
+
 `--download-moco` Download .moco files
+
 `--download-nii` Download .nii files
+
 `--download-params` Download .params files
+
 `--download-snaps` Download snapshot files (all files in the SNAPSHOTS folder)
+
 `--download-sub` Download .sub files
+
 `--download-suvr` Download suvr files
+
 `--download-tac` Download tac files
+
 `--download-tb` Download .tb files
+
 `--download-txt` Download .txt files
+
 `--download-no-ext` Download files with no extension
+
 `--download-SUVR4dfp` Download SUVR.4dfp and SUVR_g8.4dfp files
+
 `--download-T10014dfp` Download T1001.4dfp file
+
 `--download-PETFOV` Download PETFOV.4dfp files
+
 `--download-RSFMask` Download RSFMask.4dfp files
+
 `--download-wmparc` Download all files containing "wmparc" in the name
 
 <br>
