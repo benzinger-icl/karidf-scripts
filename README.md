@@ -34,9 +34,8 @@ This script downloads scans of a specified type and organizes the files.
 
 `<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
   
-<br>
-<br>
-<br>
+**Example Usage**
+
 The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
 where out_dir is your output directory path and cnda_username is your own cnda username.
 
@@ -44,8 +43,7 @@ where out_dir is your output directory path and cnda_username is your own cnda u
 ./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
 ```
 
-
-## Script output
+**Script output**
 
 This script organizes the files into folders like this:
 
