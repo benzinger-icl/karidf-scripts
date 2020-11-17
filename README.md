@@ -42,7 +42,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 <br>
 
 # Downloading MR and PET scan files
-## download_scans/download_scans_by_scan_type.sh 
+**download_scans/download_scans_by_scan_type.sh**
 
 This script downloads all or a specificed type of MR and PET. 
 
@@ -117,7 +117,7 @@ A log file will be created named, downloading_log_XXX.log,  that contains the li
 <br>
 
 # Downloading FreeSurfer files
-## download_freesurfer/download_freesurfer.py
+**download_freesurfer/download_freesurfer.py**
 
 This script downloads all or a specific type of FreeSurfer files.
 
@@ -290,7 +290,7 @@ Creates a log file `to_download_manually_fs_files.log` - contains a list of all 
 <br>
 
 # Downloading PUP files
-## download_pup/download_pup.py
+**download_pup/download_pup.py**
 
 This script downloads all or a specific type of PUP files.
 
