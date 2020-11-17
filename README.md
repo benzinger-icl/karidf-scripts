@@ -408,6 +408,22 @@ pup_id/SNAPSHOTS
 pup_id/LOG
 ```
 
+# Detailed instructions on running scripts
+
+1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
+
+2. Extract the .zip file onto your local computer and move the desired script (ex. download_freesurfer.py) into the folder you will be working from.
+
+3. Download / create CSV files necessary to run scripts.  The required csv's are explained in the "Downloading...." sections.  
+
+4. Move the csv file(s) into the same folder as the script.
+
+5. If you are running a download script, create an empty directory in the same folder as your script and make a note of its name. This is the directory where your scan files will be downloaded to.
+
+6. Go into your command line. On Windows you can use a terminal system like MobaXTerm. If you're using a Mac you can use Terminal. Make sure you are not running the script while logged in as the root user. Change directories to the folder your scripts and empty folder are in using the `cd` command.
+
+
+
 # Contact information
 
 If you have any questions regarding the scripts in this repository, please contact Christine Pulizos at pulizosc@wustl.edu.
