@@ -3,7 +3,7 @@
 - [Prerequisites - Please Read](#prerequisites---please-read)
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
-  * [Instructions on running scripts](#instructions-on-running-scripts)
+- [Instructions on running scripts](#instructions-on-running-scripts)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
@@ -41,7 +41,10 @@ XNAT tokens are a secure way of authenticating your request so that XNAT can det
 
 More detailed documentation can be found here: https://wiki.xnat.org/documentation/how-to-use-xnat/generating-an-alias-token-for-scripted-authentication
 
-## Instructions on running scripts
+<br>
+<br>
+
+# Instructions on running scripts
 
 1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
 
