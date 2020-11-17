@@ -133,11 +133,102 @@ python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias
 
 `<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
 
-`<alias>`: Obtain alias token from https://cnda.wustl.edu/data/services/tokens/issue.
+`<alias>`: Obtain alias token using the instructions under "XNAT token"
   
-`<secret>`: Obtain secret token from https://cnda.wustl.edu/data/services/tokens/issue
+`<secret>`: Obtain secret token using the instructions under "XNAT token"
 
  <br>
+ 
+**Optional Flags**
+
+Include any of the following optional flags to only download particular filetypes, or include no flags to download the entire set of files:
+
+`--download-annot` Download .annot files
+
+`--download-area` Download .area files
+
+`--download-avg_curv` Download .avg_curv files
+
+`--download-bak` Download .bak files
+
+`--download-cmd` Download .cmd files
+
+`--download-crv` Download .crv files
+
+`--download-csurfdir` Download .csurfdir files
+
+`--download-ctab` Download .ctab files
+
+`--download-curv` Download .curv files
+
+`--download-dat` Download .dat files
+
+`--download-defect_borders` Download .defect_borders files
+
+`--download-defect_chull` Download .defect_chull files
+
+`--download-defect_labels` Download .defect_labels files
+
+`--download-done` Download .done files
+
+`--download-env` Download .env files
+
+`--download-H` Download .H files
+
+`--download-inflated` Download .inflated files
+
+`--download-jacobian_white` Download .jacobian_white files
+
+`--download-K` Download .K files
+
+`--download-label` Download .label files
+
+`--download-local-copy` Download .local-copy files
+
+`--download-log` Download all log files, in both the LOG folder and DATA folder
+
+`--download-lta` Download .lta files
+
+`--download-mgh` Download .mgh files
+
+`--download-mgz` Download .mgz files
+
+`--download-m3z` Download .mgz files
+
+`--download-mid` Download .mid files
+
+`--download-nofix` Download .nofix files
+
+`--download-old` Download .old files
+
+`--download-orig` Download .orig files
+
+`--download-pial` Download .pial files
+
+`--download-reg` Download .reg files
+
+`--download-smoothwm` Download .smoothwm files
+
+`--download-snaps` Download snapshot files (all files in the SNAPSHOTS folder)
+
+`--download-sphere` Download .sphere files
+
+`--download-stats` Download stats files
+
+`--download-sulc` Download sulc files
+
+`--download-thickness` Download .thickness files
+
+`--download-touch` Download .touch files
+
+`--download-txt` Download .txt files
+
+`--download-volume` Download .volume files
+
+`--download-white` Download .white files
+
+`--download-xdebug_mris_calc` Download .xdebug_mris_calc files
+
  
 **Example Usage**
 
@@ -165,10 +256,21 @@ where out_dir is your output directory path and your alias_token and secret_toke
 This script organizes the files into folders like this:
 
 ```
-directory_name/experiment_id/scan_type/
+fs_id/DATA/atlas (if FS 5.1 or 5.0)
+fs_id/DATA/label
+fs_id/DATA/mri
+fs_id/DATA/scripts
+fs_id/DATA/stats
+fs_id/DATA/surf
+fs_id/DATA/touch
+fs_id/DATA/tmp
+fs_id/SNAPSHOTS
+fs_id/LOG
 ```
 
-A log file will be created named, downloading_log_XXX.log,  that contains the list of scans downloaded.
+Creates a  log file `download_fs.log`  - contains all output from the script.
+Creates a log file `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
+Creates a log file `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
 
 
 
@@ -178,78 +280,6 @@ A log file will be created named, downloading_log_XXX.log,  that contains the li
 
 
 
-
-## Download FreeSurfer files:
-### Instructions:
-1. Download python 2.7 (script written under this version)
-https://www.python.org/downloads/
-
-2. Make sure the following python packages are installed:
-- sys
-- json
-- argparse
-- datetime
-- csv
-- os
-- base64
-- shutil
-- requests
-- time
-- urllib2
-- getpass
-- calendar
-- urllib
-
-3. Download the karidf-scripts repository.
-
-4. In the download_freesurfer directory, update the download_freesurfer_list.csv with the FreeSurfer IDs you want to download.
-- Must be the FS ID that begins with the accession number (begins with CNDA_).
-- Do not include a header.
-
-Example of csv: 
-||
-|-------------|
-| CNDA_E12345_freesurfer_2017101912345 |
-| CNDA_E57844_freesurfer_2019102112345  |
-| CNDA_E19495_freesurfer_2018112212345  |
-
-
-5. Open the terminal and change your directory to the download_freesurfer folder.
-
-```
-cd /path/to/download_freesurfer
-```
-
-
-6. Run the download_freesurfer.sh script:
-
-General usage:
-```
-python download_freesurfer.py <fs_ids.csv> <site> <destination_dir> -u <alias> -p <secret>
-```
-<fs_ids.csv> : a csv of FreeSurfer IDs you want to download with following columns with no header row: Freesurfer ID (e.g. CNDA_E12345_freesurfer_2017101912345). 
-- Must be the FS ID that begins with the accession number (begins with CNDA_).
-<site> : the site to download from: https://cnda.wustl.edu
-<destination_dir> : the output directory for the downloaded FreeSurfers.
-<alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
-<secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
-
-### Script Output Description
-The files will be organized into the following structure:
-${fs_id}/DATA/atlas (if FS 5.1 or 5.0)
-${fs_id}/DATA/label
-${fs_id}/DATA/mri
-${fs_id}/DATA/scripts
-${fs_id}/DATA/stats
-${fs_id}/DATA/surf
-${fs_id}/DATA/touch
-${fs_id}/DATA/tmp
-${fs_id}/SNAPSHOTS
-${fs_id}/LOG
-
-Creates a log file at `download_fs.log` - contains all output from the script.
-Creates a log file at `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
-Creates a log file at `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
 
 ## Download PUP files:
 ### Instructions:
