@@ -4,6 +4,7 @@
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
   * [Instructions on running scripts](#instructions-on-running-scripts)
+  * [Creating a CSV file for scripts](#creatin-a-csv-file-for-scripts)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
@@ -55,7 +56,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 
 6. Go into your command line. On Windows you can use a terminal system like MobaXTerm. If you're using a Mac you can use Terminal. Make sure you are not running the script while logged in as the root user. Change directories to the folder your scripts and empty folder are in using the `cd` command.
 
-## Creating a CSV file for use with these scripts
+## Creating a CSV file for scripts
 
 When you run any of the scripts, you will need to download or create a CSV of OASIS experiment IDs or Freesurfer IDs to use as an input to the script. This can be created from a search result table on XNAT Central, described on the XNAT Wiki on the OASIS on XNAT Central page.
 
