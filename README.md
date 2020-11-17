@@ -22,6 +22,7 @@ This script downloads scans of a specified type and organizes the files.
 ```
 ./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
 ```
+
 <br>
 
 **Required inputs:**
@@ -36,6 +37,8 @@ This script downloads scans of a specified type and organizes the files.
 
 `<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
   
+ <br>
+ 
 **Example Usage**
 
 1. Create a csv containing experiment_id without a header.
@@ -68,6 +71,7 @@ where out_dir is your output directory path and cnda_username is your own cnda u
 ```
 ./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
 ```
+<br>
 
 **Script output**
 
