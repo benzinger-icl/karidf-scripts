@@ -9,6 +9,43 @@
 This repository contains scripts to download raw imaging scans, freesurfer files, and PUP files from an XNAT platform (i.e. CNDA). These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
 
 
+
+# Downloading MR and PET Scan files
+
+## download_scans/download_scans_by_scan_type.sh 
+
+This script downloads scans of a specified type and organizes the files. 
+
+
+Usage: 
+```
+./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
+```
+
+Required inputs:
+
+`<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
+
+`<scan_type>` - The scan type of the scan you want to download. (e.g. T1w, angio, bold, fieldmap, FLAIR). For example, there are several scan names listed for T1 scans (i.e. MPRAGE, SAG T1 MPRAGE, Accelerated Sagittal MPRAGE, etc).  This scan names vary depending on the list of sessions. You can also enter multiple scan types in the file. (e.g. T2w,swi,bold). Without this argument, all scans for the given experiment_id will be downloaded.
+
+`<directory_name>` - A directory path (relative or absolute) to save the scan files to. If this directory doesn't exist when you run the script, it will be created automatically.
+
+`<xnat_username>` - Your XNAT username (you will be prompted for your password before downloading) or the 
+
+
+
+This script organizes the files into folders like this:
+
+```
+directory_name/OAS30001_MR_d0129/anat1/file.json
+directory_name/OAS30001_MR_d0129/anat1/file.nii.gz
+directory_name/OAS30001_MR_d0129/anat4/file.json
+directory_name/OAS30001_MR_d0129/anat4/file.nii.gz
+```
+
+
+
+
 ## Download raw imaging scans:
 ### Instructions:
 1. Download the karidf-scripts repository.
