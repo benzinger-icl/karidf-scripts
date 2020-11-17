@@ -17,12 +17,12 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 This script downloads scans of a specified type and organizes the files. 
 
 
-General Usage: 
+**General Usage:**
 ```
 ./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
 ```
 
-Required inputs:
+**Required inputs:**
 
 `<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
 
@@ -37,9 +37,6 @@ Required inputs:
 <br>
 <br>
 <br>
-<br>
-
-
 The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
 where out_dir is your output directory path and cnda_username is your own cnda username.
 
