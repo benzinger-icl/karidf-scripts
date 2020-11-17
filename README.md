@@ -43,7 +43,7 @@ This script downloads scans of a specified type and organizes the files.
 
 1. Create a csv containing experiment_id without a header.
 
-Example:
+scan_to_download.csv example:
 
 |<!-- -->   |
 |-------------|
@@ -54,7 +54,7 @@ Example:
 
 2. Create a csv containing scan types/names without a header.
 
-Example:
+scan_types.csv example:
 
 ||
 |-------------|
