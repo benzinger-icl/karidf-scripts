@@ -5,6 +5,7 @@
    * [XNAT Tokens](#xnat-tokens)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
+- [Contact information](#contact-information)
 
 <br>
 <br>
@@ -285,104 +286,107 @@ Creates a log file `to_download_manually_fs.log` - contains a list of all FS IDs
 Creates a log file `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
 
 
+<br>
+<br>
+
+# Downloading PUP files
+## download_pup/download_pup.py
+
+This script downloads all or a specific type of PUP files.
+
+<br>
+
+**General Usage:**
+```
+python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <secret>
+```
+
+<br>
+
+**Required inputs:**
+
+`<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
+
+`<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
+
+`<pup_ids.csv>` - A Unix formatted, comma-separated file containing a column for PUP IDs (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345) without a header.
+
+`<alias>`: Obtain alias token using the instructions under "XNAT token"
+  
+`<secret>`: Obtain secret token using the instructions under "XNAT token"
+
+ <br>
+ 
+**Optional Flags**
+
+Include any of the following optional flags to only download particular filetypes, or include no flags to download the entire set of files:
 
 
+`--download-4dfp` Download 4dfp files (.4dfp.hdr, .4dfp.ifh, .4dfp.img, .4dfp.img.rec)
+`--download-dat` Download .dat files
+`--download-info` Download .info files
+`--download-logs` Download all log files, in both the LOG folder and DATA folder
+`--download-lst` Download .lst files
+`--download-mgz` Download .mgz files
+`--download-moco` Download .moco files
+`--download-nii` Download .nii files
+`--download-params` Download .params files
+`--download-snaps` Download snapshot files (all files in the SNAPSHOTS folder)
+`--download-sub` Download .sub files
+`--download-suvr` Download suvr files
+`--download-tac` Download tac files
+`--download-tb` Download .tb files
+`--download-txt` Download .txt files
+`--download-no-ext` Download files with no extension
+`--download-SUVR4dfp` Download SUVR.4dfp and SUVR_g8.4dfp files
+`--download-T10014dfp` Download T1001.4dfp file
+`--download-PETFOV` Download PETFOV.4dfp files
+`--download-RSFMask` Download RSFMask.4dfp files
+`--download-wmparc` Download all files containing "wmparc" in the name
 
+<br>
+ 
+**Example Usage**
 
+1. Create a csv containing PUP IDs without a header.
 
+download_pup_list.csv example:
 
-
-
-## Download PUP files:
-### Instructions:
-1. Download python 2.7 (script written under this version)
-https://www.python.org/downloads/
-
-2. Make sure the following python packages are installed:
-- argparse
-- datetime
-- csv
-- requests
-- time
-- calendar
-- getpass
-- os
-
-3. Download the karidf-scripts repository.
-
-4. In the download_pup directory, update the download_pup_list.csv with the PUP IDs you want to download.
-- Must be the PUP ID that begins with the accession number (begins with CNDA_).
-- Do not include a header.
-
-Example of csv: 
 ||
 |-------------|
 | CNDA_E12345_PUPTIMECOURSE_2017101912345 |
 | CNDA_E57844_PUPTIMECOURSE_2019102112345  |
 | CNDA_E19495_PUPTIMECOURSE_2018112212345  |
 
+2. Run download_pup.py script
 
-5. Open the terminal and change your directory to the download_pup folder.
+The command below is an example of downloading all PUP files
+where out_dir is your output directory path and ALIAS and SECRET are your alias and secret tokens.
 
-```
-cd /path/to/download_pup
-```
-
-
-6. Run the download_pup.sh script:
-
-General usage:
-```
-python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <secret>
+**Note** PUP files can range from 1gb - 10 gb.
 
 ```
-<pup_ids.csv> : a csv of PUP IDs you want to download. The script expects the following columns: PUP_ID (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345). 
-     - Must be the PUP ID that begins with the accession number (begins with CNDA_ or DCA_ or CENTRAL_, etc).
-<site> : the site to download from: https://cnda.wustl.edu
-<destination_dir> : the output directory to download to
-- u <alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
-- p <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
+python download_pup.py https://cnda.wustl.edu out_dir -c download_pup_list.csv -u ALIAS -p SECRET
+```
 
-Choose one of these flags to read from a CSV of PUP IDs, or specify a single PUP ID:
--c filename.csv or 
---csv filename.csv to read from a CSV of PUP IDs with no header row (specify filename.csv) or
--i pup_id or --id pup_id to download for a single PUP ID (specify pup_id)
+The command below is an example of downloading the .4dfp PUP files
+where out_dir is your output directory path and ALIAS and SECRET are your alias and secret tokens.
+```
+python download_pup.py https://cnda.wustl.edu out_dir -c download_pup_list.csv -u ALIAS -p SECRET --download-4dfp
+```
 
-7. Add on optional flags
-Include any of these optional flags to only download particular file types, or include no flags to download the entire set of files:
+<br>
 
-Include the --create-logs flag to create log files that show the script output and specify which files have been skipped.
+**Script output**
 
---download-4dfp: Download 4dfp files (.4dfp.hdr, .4dfp.ifh, .4dfp.img, .4dfp.img.rec)
---download-dat: Download .dat files
---download-info: Download .info files
---download-logs: Download all log files, in both the LOG folder and DATA folder
---download-lst: Download .lst files
---download-mgz: Download .mgz files
---download-moco: Download .moco files
---download-nii: Download .nii files
---download-params: Download .params files
---download-snaps: Download snapshot files (all files in the SNAPSHOTS folder)
---download-sub: Download .sub files
---download-suvr: Download suvr files
---download-tac: Download tac files
---download-tb: Download .tb files
---download-txt: Download .txt files
---download-no-ext: Download files with no extension
---download-SUVR4dfp: Download SUVR.4dfp and SUVR_g8.4dfp files
---download-T10014dfp: Download T1001.4dfp file
---download-PETFOV: Download PETFOV.4dfp files
---download-RSFMask: Download RSFMask.4dfp files
---download-wmparc: Download all files containing "wmparc" in the name
+This script organizes the files into folders like this:
 
+```
+pup_id/DATA
+pup_id/SNAPSHOTS
+pup_id/LOG
+```
 
-### Script Output Description
-Organizes the files into the following folder structure: 
-${pup_id}/DATA
-${pup_id}/SNAPSHOTS
-${pup_id}/LOG
+# Contact information
 
-If the --create-logs flag is included:
-Creates a log file at `download_pup.log` - contains all output from the script.
-Creates a log file at `to_download_manually_pup.log` - contains a list of all PUP IDs that could not be found.
-Creates a log file at `to_download_manually_pup_files.log` - contains a list of all files that could not be downloaded and their PUP IDs (in the format pup_id, filename).
+If you have any questions regarding the scripts in this repository, please contact Christine Pulizos at pulizosc@wustl.edu.
