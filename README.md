@@ -24,7 +24,7 @@ python -m pip install requests
 ```
 
 ## XNAT Tokens
-XNAT tokens are a secure way of authenticating your request so that XNAT can determine whether you are allowed to perform the action that you are requesting. Do not share your token with anyone else.
+XNAT tokens are a secure way of authenticating your request so that XNAT can determine whether you are allowed to perform the action that you are requesting. The tokens expire in a short period of time. Do not share your token with anyone else.
 
 1. Log in to CNDA ( https://cnda.wustl.edu)
 2. Click on your username in the very top right navigation bar to go to your User Account page. 
