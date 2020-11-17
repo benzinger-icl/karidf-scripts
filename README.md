@@ -41,10 +41,6 @@ XNAT tokens are a secure way of authenticating your request so that XNAT can det
 
 More detailed documentation can be found here: https://wiki.xnat.org/documentation/how-to-use-xnat/generating-an-alias-token-for-scripted-authentication
 
-<br>
-<br>
-
-
 ## Instructions on running scripts
 
 1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
@@ -59,6 +55,20 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 
 6. Go into your command line. On Windows you can use a terminal system like MobaXTerm. If you're using a Mac you can use Terminal. Make sure you are not running the script while logged in as the root user. Change directories to the folder your scripts and empty folder are in using the `cd` command.
 
+## Creating a CSV file for use with these scripts
+
+When you run any of the scripts, you will need to download or create a CSV of OASIS experiment IDs or Freesurfer IDs to use as an input to the script. This can be created from a search result table on XNAT Central, described on the XNAT Wiki on the OASIS on XNAT Central page.
+
+1. From an MR Session search, use Options then Edit Columns to include the "MR ID" column in your column view. If you are doing a PET Session search, include the "PET ID" column. If you are downloading Freesurfer files, use the Freesurfer tab from the OASIS project page, or do an Advanced Search for Freesurfers and specify the OASIS3 project. Then include the "Freesurfer ID" column in your column view.
+
+2. Download the resulting table by selecting Options then Spreadsheet.
+  
+3. Once you download a spreadsheet, remove all columns from it except for the "MR ID" column and save it as a .csv file. This can be done In Microsoft Excel by selecting Save As and choosing "CSV (Comma delimited) *.csv" as the file type.
+
+4. If you save a file using Microsoft Excel, you must convert it to Unix format before using it as input to a script. If the file is incorrectly formatted, you may experience errors or download failures when you run the script. Instructions for doing this conversion are below.
+
+<br>
+<br>
 
 # Downloading MR and PET scan files
 **download_scans/download_scans_by_scan_type.sh**
