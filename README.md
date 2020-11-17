@@ -24,15 +24,16 @@ python -m pip install requests
 ```
 
 ## XNAT Tokens
-XNAT tokens are a secure way of authenticating your request so that XNAT can determine whether you are allowed to perform the action that you are requesting.
+XNAT tokens are a secure way of authenticating your request so that XNAT can determine whether you are allowed to perform the action that you are requesting. Please do not share your token.
 
 1. Log in to CNDA ( https://cnda.wustl.edu)
 2. Click on your username in the very top right navigation bar to go to your User Account page. 
 3. Click on the "Manage Alias Tokens" tab. 
-4. Click "Create Alias Token". 
-- This generates a hashed combination of your user ID and password that can be used as login credentials temporarily until it expires. Please do not share.
-5. Click on the generated "Alias" link to view the full token.
+4. Click "Create Alias Token".
+5. Click on the generated "Alias" link or the "view" button under the "Actions" column to view the full token
 6. Copy the "alias" and "secret" strings and paste them into the following commands below when specified.
+
+More detailed documentation can be found here: https://wiki.xnat.org/documentation/how-to-use-xnat/generating-an-alias-token-for-scripted-authentication
 
 
 # Downloading MR and PET scan files
