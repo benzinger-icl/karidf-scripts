@@ -1,6 +1,7 @@
 # Table of Contents
 - [KARI data freeze scripts overview](#kari-data-freeze-scripts-overview)
-- [XNAT Tokens - Please Read](#xnat-tokens---please-read)
+- [Prerequisites - Please Read](#prerequisites---please-read)
+  * [Python packages](#python-packages)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 
 
@@ -9,8 +10,11 @@
 # KARI data freeze scripts overview
 This repository contains scripts to download Knight Alzheimer Research Institute (KARI) raw imaging scans, freesurfer files, and PUP files from the XNAT platform, CNDA. These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
 
+All scripts using python 3.  
 
-# XNAT Tokens - Please Read
+
+# Prerequisites - Please Read
+## Python packages
 
 
 # Downloading MR and PET scan files
