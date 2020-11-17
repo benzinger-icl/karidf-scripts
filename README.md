@@ -40,7 +40,7 @@ This script downloads scans of a specified type and organizes the files.
 
 Example:
 
-||
+|<!-- -->   |
 |-------------|
 | CNDA_E71543 |
 | CNDA_E1594  |
