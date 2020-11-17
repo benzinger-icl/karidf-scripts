@@ -7,7 +7,6 @@
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
-- [Downloading PUP files](#downloading-pup-files)
 - [Contact information](#contact-information)
 
 <br>
