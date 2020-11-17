@@ -15,13 +15,12 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 ## download_scans/download_scans_by_scan_type.sh 
 
 This script downloads scans of a specified type and organizes the files. 
-<br>
-<br>
+
+
 General Usage: 
 ```
 ./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
 ```
-
 
 Required inputs:
 
@@ -35,7 +34,10 @@ Required inputs:
 
 `<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
   
-
+<br>
+<br>
+<br>
+<br>
 
 
 The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
