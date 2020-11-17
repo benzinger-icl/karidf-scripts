@@ -59,7 +59,7 @@ This script downloads all or a specificed type of MR and PET.
 
 `<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
 
-`<scan_type>` - The scan type of the scan you want to download. (e.g. T1w, angio, bold, fieldmap, FLAIR). For example, there are several scan names listed for T1 scans (i.e. MPRAGE, SAG T1 MPRAGE, Accelerated Sagittal MPRAGE, etc).  This scan names vary depending on the list of sessions. You can also enter multiple scan types in the file. (e.g. T2w,swi,bold). Without this argument, all scans for the given experiment_id will be downloaded.
+`<scan_type>` - The scan type of the scan you want to download. (e.g. T1w, angio, bold, fieldmap, FLAIR). You must include all scan names listed for the specific scan type scans (for example, T1 scans can be named as MPRAGE, SAG T1 MPRAGE, Accelerated Sagittal MPRAGE, etc).  The scan names vary depending on sessions. You can also enter multiple scan types in the file. (e.g. T2w,swi,bold). Without this argument, all scans for the given experiment_id will be downloaded.
 
 `<directory_name>` - A directory path (relative or absolute) to save the scan files to. If this directory doesn't exist when you run the script, it will be created automatically.
 
