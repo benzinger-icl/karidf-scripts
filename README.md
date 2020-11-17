@@ -36,9 +36,33 @@ This script downloads scans of a specified type and organizes the files.
   
 **Example Usage**
 
+1. Create a csv containing experiment_id without a header.
+
+Example:
+
+||
+|-------------|
+| CNDA_E71543 |
+| CNDA_E1594  |
+| CNDA_E2240  |
+| CNDA_E1112  |
+
+2. Create a csv containing scan types/names without a header.
+
+Example:
+
+||
+|-------------|
+| SAG 3D FSPGR |
+| MPRAGE GRAPPA2  |
+| AX T1  |
+| FLAIR  |
+| DTI  |
+
+3. Run download_scans_by_scan_type.sh script
+
 The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
 where out_dir is your output directory path and cnda_username is your own cnda username.
-
 ```
 ./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
 ```
