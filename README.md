@@ -1,23 +1,23 @@
 # Table of Contents
-- [KARI Data Freeze Scripts Overview](#kari-data-freeze-scripts-overview)
+- [KARI data freeze scripts overview](#kari-data-freeze-scripts-overview)
+- [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 
 
 
 
-
-# KARI Data Freeze Scripts Overview
-This repository contains scripts to download raw imaging scans, freesurfer files, and PUP files from an XNAT platform (i.e. CNDA). These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
-
+# KARI data freeze scripts overview
+This repository contains scripts to download Knight Alzheimer Research Institute (KARI) raw imaging scans, freesurfer files, and PUP files from the XNAT platform, CNDA. These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA.
 
 
-# Downloading MR and PET Scan files
+
+# Downloading MR and PET scan files
 
 ## download_scans/download_scans_by_scan_type.sh 
 
 This script downloads scans of a specified type and organizes the files. 
 
 
-Usage: 
+General Usage: 
 ```
 ./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
 ```
@@ -32,16 +32,28 @@ Required inputs:
 
 `<xnat_username>` - Your XNAT username (you will be prompted for your password before downloading) or the 
 
+`<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
+  
 
+The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
+where out_dir is your output directory path and cnda_username is your own cnda username.
+
+```
+./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
+```
+
+
+## Script output
 
 This script organizes the files into folders like this:
 
 ```
-directory_name/OAS30001_MR_d0129/anat1/file.json
-directory_name/OAS30001_MR_d0129/anat1/file.nii.gz
-directory_name/OAS30001_MR_d0129/anat4/file.json
-directory_name/OAS30001_MR_d0129/anat4/file.nii.gz
+directory_name/experiment_id/scan_type/
 ```
+
+A log file will be created named, downloading_log_XXX.log,  that contains the list of scans downloaded.
+
+
 
 
 
@@ -99,12 +111,7 @@ General usage:
 <xnat_username> - Your username used for accessing data on the given site (you will be prompted for your password before downloading)
 <site> - the full path to the xnat site you are using, ie. https://cnda.wustl.edu
   
-  
-Specifically, for the KARI Master Data Freeze CNDA project, use the yntax below but change cnda_username to your current cnda username.
 
-```
-./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
-```
 
 
 ### Script Output Description
