@@ -4,14 +4,16 @@
   * [Python packages](#python-packages)
    * [XNAT Tokens](#xnat-tokens)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
+- [Downloading FreeSurfer files](#downloading-freesurfer-files)
 
-
-
+<br>
+<br>
 
 # KARI data freeze scripts overview
 This repository contains scripts to download Knight Alzheimer Research Institute (KARI) raw imaging scans, freesurfer files, and PUP files from the XNAT platform, CNDA. These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA. All scripts were written using python 3.
 
-
+<br>
+<br>
 
 # Prerequisites - Please Read
 ## Python packages
@@ -35,6 +37,8 @@ XNAT tokens are a secure way of authenticating your request so that XNAT can det
 
 More detailed documentation can be found here: https://wiki.xnat.org/documentation/how-to-use-xnat/generating-an-alias-token-for-scripted-authentication
 
+<br>
+<br>
 
 # Downloading MR and PET scan files
 ## download_scans/download_scans_by_scan_type.sh 
@@ -108,10 +112,10 @@ directory_name/experiment_id/scan_type/
 
 A log file will be created named, downloading_log_XXX.log,  that contains the list of scans downloaded.
 
+<br>
+<br>
 
-
-
-# Downloading FreeSurfer files:
+# Downloading FreeSurfer files
 ## download_freesurfer/download_freesurfer.py
 
 This script downloads all or a specific type of FreeSurfer files.
@@ -229,6 +233,7 @@ Include any of the following optional flags to only download particular filetype
 
 `--download-xdebug_mris_calc` Download .xdebug_mris_calc files
 
+<br>
  
 **Example Usage**
 
@@ -242,13 +247,20 @@ download_freesurfer_list.csv example:
 | CNDA_E57844_freesurfer_2019102112345  |
 | CNDA_E19495_freesurfer_2018112212345  |
 
-2. Run download_scans_by_scan_type.sh script
+2. Run download_freesurfer.py script
 
-The command below is an example of downloading FreeSurfer files from the KARI Master Data Freeze CNDA project 
-where out_dir is your output directory path and your alias_token and secret_token are found from https://cnda.wustl.edu/data/services/tokens/issue
+The command below is an example of downloading all FreeSurfer files
+where out_dir is your output directory path and ALIAS and SECRET are your alias and secret tokens.
 ```
-./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir -u ALIAS_TOKEN -p SECRET_TOKEN
+python download_freesurfer.py https://cnda.wustl.edu out_dir -c download_freesurfer_list.csv -u ALIAS -p SECRET
 ```
+
+The command below is an example of downloading the .pial and .mgz FreeSurfer files
+where out_dir is your output directory path and ALIAS and SECRET are your alias and secret tokens.
+```
+python download_freesurfer.py https://cnda.wustl.edu out_dir -c download_freesurfer_list.csv -u ALIAS -p SECRET --download-mgz --download-pial
+```
+
 <br>
 
 **Script output**
@@ -256,14 +268,14 @@ where out_dir is your output directory path and your alias_token and secret_toke
 This script organizes the files into folders like this:
 
 ```
-fs_id/DATA/atlas (if FS 5.1 or 5.0)
-fs_id/DATA/label
-fs_id/DATA/mri
-fs_id/DATA/scripts
-fs_id/DATA/stats
-fs_id/DATA/surf
-fs_id/DATA/touch
-fs_id/DATA/tmp
+fs_id/DATA/fs_id/atlas (if FS 5.1 or 5.0)
+fs_id/DATA/fs_id/label
+fs_id/DATA/fs_id/mri
+fs_id/DATA/fs_id/scripts
+fs_id/DATA/fs_id/stats
+fs_id/DATA/fs_id/surf
+fs_id/DATA/fs_id/touch
+fs_id/DATA/fs_id/tmp
 fs_id/SNAPSHOTS
 fs_id/LOG
 ```
