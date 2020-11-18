@@ -430,4 +430,4 @@ pup_id/LOG
 
 # Additional help with scripts?
 
-Please submit your question or concern in the issues section on this repository, thank you!
+Please submit your questions or concerns in the issues section on this repository, thank you!
