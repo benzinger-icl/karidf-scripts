@@ -106,6 +106,7 @@ If you only have one session you need to download scans for, you can use the `-i
 
 session_ids.csv example:
 
+||
 |-------------|
 | CNDA_E71543 |
 | CNDA_E1594  |
@@ -116,6 +117,7 @@ session_ids.csv example:
 
 requested_scan_types.csv example:
 
+||
 |-------------|
 | SAG 3D FSPGR |
 | MPRAGE GRAPPA2  |
@@ -277,6 +279,7 @@ Include any of the following optional flags to only download particular filetype
 
 download_freesurfer_list.csv example:
 
+||
 |-------------|
 | CNDA_E12345_freesurfer_2017101912345 |
 | CNDA_E57844_freesurfer_2019102112345  |
@@ -409,6 +412,7 @@ Include any of the following optional flags to only download particular filetype
 
 download_pup_list.csv example:
 
+||
 |-------------|
 | CNDA_E12345_PUPTIMECOURSE_2017101912345 |
 | CNDA_E57844_PUPTIMECOURSE_2019102112345  |
