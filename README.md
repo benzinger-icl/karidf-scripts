@@ -43,7 +43,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 <br>
 <br>
 
-# Instructions on running scripts
+# Instructions on running these scripts
 
 1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
 
@@ -69,30 +69,42 @@ This script downloads all or a specificed type of MR and PET.
 
 **General Usage:**
 ```
-./download_scans_by_scan_type.sh <input_file.csv> <scan_type_list.csv> <directory_name> <xnat_username> <site>
+python3 download_scans.py <site> <destination_dir> -c <session_ids.csv> -t <requested_scan_types.csv> -u <alias> -p <secret>
 ```
 
 <br>
 
 **Required inputs:**
 
-`<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
-
-`<scan_type>` - The scan type of the scan you want to download. (e.g. T1w, angio, bold, fieldmap, FLAIR). You must include all scan names listed for the specific scan type scans (for example, T1 scans can be named as MPRAGE, SAG T1 MPRAGE, Accelerated Sagittal MPRAGE, etc).  The scan names vary depending on sessions. You can also enter multiple scan types in the file. (e.g. T2w,swi,bold). Without this argument, all scans for the given experiment_id will be downloaded.
-
-`<directory_name>` - A directory path (relative or absolute) to save the scan files to. If this directory doesn't exist when you run the script, it will be created automatically.
-
-`<xnat_username>` - Your XNAT username (you will be prompted for your password before downloading) or the 
-
 `<site>` - the XNAT website url ( https://cnda.wustl.edu/ )
+
+`<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
+
+`<session_ids.csv>` - A Unix formatted, comma-separated file containing a column for MR and PET session IDs (e.g. CNDA_E12345) without a header.
+
+`<requested_scan_types.csv>` - A Unix formatted, comma-separated file containing a column with scan type names (e.g. "MPRAGE" or "SAG T1 MPR") without a header.
+
+`<alias>`: Obtain alias token using the instructions under "XNAT token"
   
+`<secret>`: Obtain secret token using the instructions under "XNAT token"
+
+ <br>
+ 
+**Optional Flags**
+
+Include the `-t <requested_scan_types.csv>` to download only scans that match your requested scan type list. Leave this option out to download all scans for each session in your `session_ids.csv` file.
+
+Include the `--create-logs` flag to create output logs. Two logs will be created: one contains all output from the script, and the other will contain a catalog of the scans that were downloaded for each session.
+
+If you only have one session you need to download scans for, you can use the `-i` or `--id` flag instead of including `-c <session_ids.csv>`. Specify it like this: `-i CNDA_E123456`
+
  <br>
  
 **Example Usage**
 
 1. Create a csv containing experiment_id without a header.
 
-scan_to_download.csv example:
+session_ids.csv example:
 
 ||
 |-------------|
@@ -103,7 +115,7 @@ scan_to_download.csv example:
 
 2. Create a csv containing scan types/names without a header.
 
-scan_types.csv example:
+requested_scan_types.csv example:
 
 ||
 |-------------|
@@ -113,12 +125,12 @@ scan_types.csv example:
 | FLAIR  |
 | DTI  |
 
-3. Run download_scans_by_scan_type.sh script
+3. Run download_scans.py script
 
 The command below is an example of downloading data from the KARI Master Data Freeze CNDA project 
-where out_dir is your output directory path and cnda_username is your own cnda username.
+where out_dir is your output directory path and ALIAS and SECRET below are replaced with the tokens you got from CNDA.
 ```
-./download_scans_by_scan_type.sh scans_to_download.csv scan_types.csv out_dir cnda_username https://cnda.wustl.edu/
+python3 download_scans.py https://cnda.wustl.edu out_dir -c scans_to_download.csv -t requested_scan_types.csv -u ALIAS -p SECRET
 ```
 <br>
 
@@ -127,10 +139,12 @@ where out_dir is your output directory path and cnda_username is your own cnda u
 This script organizes the files into folders like this:
 
 ```
-directory_name/experiment_id/scan_type/
+out_dir/session_label/scans/scan_id-scan_type
 ```
 
-A log file will be created named, downloading_log_XXX.log,  that contains the list of scans downloaded.
+If the `--create-logs` flag is included when running the script, the following logs will be created:
+- File `download_scans_${timestamp}.log`  that contains all output from the script.
+- File `download_scans_catalog_${timestamp}.csv` - contains a list of all MR or PET Session IDs in your original list, the scans that were downloaded, and their final download status.
 
 <br>
 <br>
@@ -164,6 +178,10 @@ python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias
  <br>
  
 **Optional Flags**
+
+Include the `--create-logs` flag to create output logs. Two logs will be created: one contains all output from the script, and the other will contain a catalog of the Freesurfer resources that were downloaded.
+
+If you only have one FreeSurfer you need to download files for, you can use the `-i` or `--id` flag instead of including `-c <fs_ids.csv>`. Specify it like this: `-i CNDA_E123456_freesurfer_01234567890`
 
 Include any of the following optional flags to only download particular filetypes, or include no flags to download the entire set of files:
 
@@ -288,21 +306,21 @@ python download_freesurfer.py https://cnda.wustl.edu out_dir -c download_freesur
 This script organizes the files into folders like this:
 
 ```
-fs_id/DATA/fs_id/atlas (if FS 5.1 or 5.0)
-fs_id/DATA/fs_id/label
-fs_id/DATA/fs_id/mri
-fs_id/DATA/fs_id/scripts
-fs_id/DATA/fs_id/stats
-fs_id/DATA/fs_id/surf
-fs_id/DATA/fs_id/touch
-fs_id/DATA/fs_id/tmp
-fs_id/SNAPSHOTS
-fs_id/LOG
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/atlas (if FS 5.1 or 5.0)
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/label
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/mri
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/scripts
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/stats
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/surf
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/touch
+out_dir/mr_session_label/fs_id/DATA/fs_id/mr_session_label/tmp
+out_dir/mr_session_label/fs_id/SNAPSHOTS
+out_dir/mr_session_label/fs_id/LOG
 ```
 
-Creates a  log file `download_fs.log`  - contains all output from the script.
-Creates a log file `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
-Creates a log file `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded and their FS IDs (in the format fs_id, filename).
+If the `--create-logs` flag is included when running the script, the following logs will be created:
+- File `download_freesurfer_${timestamp}.log`  that contains all output from the script.
+- File `download_freesurfer_catalog_${timestamp}.csv` - contains a list of all FreeSurfer IDs in your original list and their final download status.
 
 
 <br>
@@ -338,8 +356,11 @@ python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <
  
 **Optional Flags**
 
-Include any of the following optional flags to only download particular filetypes, or include no flags to download the entire set of files:
+Include the `--create-logs` flag to create output logs. Two logs will be created: one contains all output from the script, and the other will contain a catalog of the PUP resources that were downloaded.
 
+If you only have one PUP you need to download files for, you can use the `-i` or `--id` flag instead of including `-c <pup_ids.csv>`. Specify it like this: `-i CNDA_E123456_PUPTIMECOURSE_01234567890`
+
+Include any of the following optional flags to only download particular filetypes, or include no flags to download the entire set of files:
 
 `--download-4dfp` Download 4dfp files (.4dfp.hdr, .4dfp.ifh, .4dfp.img, .4dfp.img.rec)
 
@@ -421,13 +442,15 @@ python download_pup.py https://cnda.wustl.edu out_dir -c download_pup_list.csv -
 This script organizes the files into folders like this:
 
 ```
-pup_id/DATA
-pup_id/SNAPSHOTS
-pup_id/LOG
+out_dir/pet_session_label/pup_id/DATA/pet_proc
+out_dir/pet_session_label/pup_id/SNAPSHOTS
+out_dir/pet_session_label/pup_id/LOG
 ```
 
+If the `--create-logs` flag is included when running the script, the following logs will be created:
+- File `download_pup_${timestamp}.log`  that contains all output from the script.
+- File `download_pup_catalog_${timestamp}.csv` - contains a list of all PUP IDs in your original list and their final download status.
 
+# Need additional help running these scripts?
 
-# Contact information
-
-If you have any questions regarding the scripts in this repository, please contact Christine Pulizos at pulizosc@wustl.edu.
+If you have any questions regarding the scripts in this repository, find any issues running them, or wish to make improvements, feel free to open a Github issue above.

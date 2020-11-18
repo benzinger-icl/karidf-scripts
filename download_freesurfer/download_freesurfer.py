@@ -19,7 +19,7 @@ import requests
 #
 # Author: Sarah Keefe
 # Contributors: Austin McCullough, Rick Herrick
-# Date Updated: 11/16/2020
+# Date Updated: 11/18/2020
 #
 # Written using python version 3
 #
@@ -28,36 +28,35 @@ import requests
 #
 #================================================================
 # Usage:  
-# python download_freesurfer.py site destination_dir -c fs_ids.csv -u <alias> -p <secret>
+# python download_freesurfer.py site destination_dir -c <fs_ids.csv> -u <alias> -p <secret>
 #================================================================
 
 #================================================================
 # Required inputs:
 # <fs_ids.csv> : a csv of FreeSurfer IDs you want to download with following columns with no header row:
-# 		Freesurfer ID (e.g. CNDA_E12345_freesurfer_2017101912345). 
-#		Must be the FS ID that begins with the accession number (begins with CNDA_).
+#       Freesurfer ID (e.g. CNDA_E12345_freesurfer_2017101912345). 
+#       Must be the FS ID that begins with the accession number (begins with CNDA_).
 # <site> : the site to download from: https://cnda.wustl.edu
 # <destination_dir> : the output directory for the downloaded FreeSurfers.
-# - u <alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
-# - p <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
+# -u <alias>: Replace <alias> with the token next to the text "alias:" found on https://cnda.wustl.edu/data/services/tokens/issue
+# -p <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
 
 # Output:
 # The files will be organized into the following structure:
-# ${fs_id}/DATA/atlas (if FS 5.1 or 5.0)
-# ${fs_id}/DATA/label
-# ${fs_id}/DATA/mri
-# ${fs_id}/DATA/scripts
-# ${fs_id}/DATA/stats
-# ${fs_id}/DATA/surf
-# ${fs_id}/DATA/touch
-# ${fs_id}/DATA/tmp
-# ${fs_id}/SNAPSHOTS
-# ${fs_id}/LOG
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/atlas (if FS 5.1 or 5.0)
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/label
+# destination_dir/${session_label}/${fs_id}/DATA${session_label}//mri
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/scripts
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/stats
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/surf
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/touch
+# destination_dir/${session_label}/${fs_id}/DATA/${session_label}/tmp
+# destination_dir/${session_label}/${fs_id}/SNAPSHOTS
+# destination_dir/${session_label}/${fs_id}/LOG
 #
-# Creates a log file at `download_fs.log` - contains all output from the script.
-# Creates a log file at `to_download_manually_fs.log` - contains a list of all FS IDs that could not be found.
-# Creates a log file at `to_download_manually_fs_files.log` - contains a list of all files that could not be downloaded 
-# and their FS IDs (in the format fs_id, filename).
+# Creates a log file at `download_freesurfer_${timestamp}.log` - contains all output from the script.
+# Creates a log file at `download_freesurfer_catalog_${timestamp}.log` - contains Freesurfers from your original list, 
+#     specifying which resources were downloaded successfully, and which failed to download.
 #================================================================
 #
 #
@@ -119,7 +118,7 @@ import requests
 # -p password or --password password to include password/secret
 #================================================================
 
-#Start Script
+# Start Script
 #================================================================
 # parse arguments to the script
 parser = argparse.ArgumentParser(description='Download all FS files for a given assessor ID.')
@@ -245,11 +244,12 @@ timestamp_log_base = str(calendar.timegm(datetime.datetime.now().timetuple()))
 
 # create a log file to write to
 if create_logs:
-    log_file = open('download_fs_log_' + timestamp_log_base + '.log', 'w')
-    log_file_missing_fs = open('not_downloaded_fs_resources_' + timestamp_log_base + '.log', 'w')
+    log_file = open('download_freesurfer_' + timestamp_log_base + '.log', 'w')
+    log_file_catalog = open('download_freesurfer_catalog_' + timestamp_log_base + '.csv', 'w')
+    log_file_catalog.write("Session ID,Session Label,Freesurfer ID,Download Information\n")
 else:
     log_file = None
-    log_file_missing_fs = None
+    log_file_catalog = None
 
 session = requests.Session()
 credentials = (user, password)
@@ -259,8 +259,8 @@ parameters = {}
 auth_url = site + "/data/JSESSION"
 
 
+# Close the XNAT connection
 def close_xnat_session():
-    # Close the XNAT connection
     try:
         closed = session.delete(auth_url)
         closed.raise_for_status()
@@ -269,6 +269,50 @@ def close_xnat_session():
     else:
         print("XNAT user session has been closed.")
 
+
+# Pull the session label for the given session ID from XNAT using the XNAT API
+def get_session_label(assessor_id, session_id):
+    # log that we are checking for the session
+    print(assessor_id + ": Pulling session label for session " + session_id + ".")
+    if create_logs:
+        log_file.write(assessor_id + ": Pulling session label for session " + session_id + ".\n")
+
+    # Pull session label using XNAT API
+    sess_label_url = site + '/data/experiments?ID=' + session_id + '&columns=label&format=csv'
+    print(assessor_id + ": Checking session info at URL: " + sess_label_url)
+    if create_logs:
+        log_file.write(assessor_id + ": Checking session info at URL:  " + sess_label_url + "\n")
+    try:
+        response = session.get(sess_label_url, params=parameters, headers=headers)
+        if response.encoding is None:
+            response.encoding = 'utf-8'
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as session_infopull_error:
+        if session_infopull_error.response.status_code == 404:
+            # No session found with this id
+            print(assessor_id + ": Session ID " + session_id + " does not exist or can't be found.")
+            if create_logs:
+                log_file.write(assessor_id + ": Session " + session_id + " does not exist or can't be found.\n")
+                log_file_catalog.write(session_id + ",,,Parent session not found\n")
+            return None
+        else:
+            print(assessor_id + ": Error code " + str(session_infopull_error.response.status_code) + " when pulling session info for session " + session_id + ".")
+            if create_logs:
+                log_file.write(assessor_id + ": Error code " + str(session_infopull_error.response.status_code) + " when pulling session info for session " + session_id + ".\n")
+                log_file_catalog.write(session_id + ",,,Parent session error code" + str(session_infopull_error.response.status_code) + "\n")
+            return None
+    else:
+        session_label = None
+        # Get the session label from the JSON result
+        label_csv_contents = response.iter_lines(decode_unicode=True)
+        label_info_reader = csv.reader(label_csv_contents, delimiter=",")
+        for info_row in label_info_reader:
+            if info_row[0] != "ID":
+                session_label = info_row[1]
+        return session_label
+
+
+# Download a file to folder_path/filename from a requests response
 def download_file(folder_path, filename, response, block_sz):
     # from https://stackoverflow.com/a/22776
     # download file in chunks in case it is too large
@@ -292,6 +336,7 @@ def download_file(folder_path, filename, response, block_sz):
     f.close()
 
 
+# extract files from a zip file based on the flags sent to the script
 def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
     fszip = zipfile.ZipFile(zip_file_path) 
     for subfile in fszip.namelist():
@@ -299,8 +344,6 @@ def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
         subfilename = fszip.getinfo(subfile).filename
 
         subfilename_split = subfilename.split(".")
-        #print(subfilename_split[0])
-        #print(subfilename_split[1])
 
         download_this_file = False
 
@@ -407,16 +450,15 @@ def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
 
             # get the new file basename and cut the filename off the end of it
             # need to create this directory before we can move the downloaded file to it
-            new_file_location=new_file_base.rsplit("/",1)[0]
-            print(os.path.join(resource_folder_path,new_file_location))
+            new_file_location = ""
+            if (new_file_base.count('/') > 0):
+                new_file_location = new_file_base.rsplit("/",1)[0]
+
             if not os.path.exists(os.path.join(resource_folder_path,new_file_location)):
-                #print("making directory: " + os.path.join(resource_folder_path,new_file_location))
                 os.makedirs(os.path.join(resource_folder_path,new_file_location))
 
-            #print(os.path.join(resource_folder_path,subfilename))
-            #print(os.path.join(resource_folder_path,new_file_base))
             print("Moving file " + new_file_base + " from zipfile subdirectory into main resource directory.")
-            shutil.move(os.path.join(resource_folder_path,subfilename),os.path.join(resource_folder_path,new_file_base))
+            shutil.move(os.path.join(resource_folder_path,subfilename),os.path.join(resource_folder_path,new_file_location))
 
             # Get the first foldername in the resource folder path - this folder structure is now empty so we can remove it.
             first_folder_path_arr=subfilename.split("/",1)
@@ -424,11 +466,13 @@ def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
             shutil.rmtree(os.path.join(resource_folder_path,first_folder_path))
 
 
+# download the contents of an XNAT resource folder for a given assessor
+# A resource folder is named "DATA", "LOG", or "SNAPSHOTS"
 def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, resource_name):
     # log that we are checking for the session
-    print("Checking for session " + dl_assessor + " folder " + resource_name + ".")
+    print("Checking for FreeSurfer " + dl_assessor + " folder " + resource_name + ".")
     if create_logs:
-        log_file.write("Checking for session " + dl_assessor + " folder " + resource_name + ".\n")
+        log_file.write("Checking for FreeSurfer " + dl_assessor + " folder " + resource_name + ".\n")
 
     # Download all files for this folder
     resource_contents_url = site + '/data/experiments/' + dl_expt + '/assessors/' + dl_assessor + '/resources/' + resource_name + \
@@ -436,9 +480,6 @@ def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, reso
     print(dl_assessor + ": Downloading from files URL: " + resource_contents_url)
     if create_logs:
         log_file.write(dl_assessor + ": Downloading from files URL:  " + resource_contents_url + "\n")
-
-    #print("Resource contents URL: " + resource_contents_url)
-
     try:
         response = session.get(resource_contents_url, params=parameters, headers=headers)
         response.raise_for_status()
@@ -448,19 +489,20 @@ def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, reso
             print(resource_name + " resource for FreeSurfer ID " + dl_assessor + " does not exist or can't be found.")
             if create_logs:
                 log_file.write("FreeSurfer " + dl_assessor + " resource " + resource_name + " does not exist or can't be found.\n")
-                log_file_missing_fs.write(dl_assessor + "," + resource_name + "\n")
             return files_download_error.response.status_code
         else:
             print("Error code " + str(files_download_error.response.status_code) + " when searching for FreeSurfer " + dl_assessor + " resource " + resource_name + ".")
             if create_logs:
                 log_file.write("Error code " + str(files_download_error.response.status_code) + " when searching for FreeSurfer " + dl_assessor + " resource " + resource_name + ".\n")
-                log_file_missing_fs.write(dl_assessor + "," + resource_name + "\n")
             return files_download_error.response.status_code
     else:
         download_file(folder_path, filename, response, 8192)
         return response.status_code
 
 
+# Download a single Freesurfer based on a given assessor ID
+# Pulls the experiment ID for the main session from the assessor
+# Determines which resource to download from based on the flags sent to the main script
 def download_one_fs(assessor_id):
 
     # split up the FreeSurfer ID to get the PET accession number (experiment_id)
@@ -472,49 +514,58 @@ def download_one_fs(assessor_id):
     if create_logs:
         log_file.write(assessor_id + ": Got experiment ID: " + experiment_id + ". \n")
 
-    # download each folder
-    # send it the log files too
-    resource_list = []
-    if download_snaps or download_all:
-        resource_list.append("SNAPSHOTS")
-    if download_logs or download_all:
-        resource_list.append("LOG")
-    if download_all or download_annot or download_area or download_avg_curv or download_bak or download_cmd or download_crv or download_csurfdir or download_ctab or download_curv or download_dat or download_defect_borders or download_defect_chull or download_defect_labels or download_done or download_env or download_H or download_inflated or download_jacobian_white or download_K or download_label or download_local_copy or download_logs or download_lta or download_m3z or download_mgh or download_mgz or download_mid or download_nofix or download_old or download_orig or download_pial or download_reg or download_smoothwm or download_sphere or download_stats or download_sulc or download_thickness or download_touch or download_txt or download_volume or download_white or download_xdebug_mris_calc or download_xfm:
-        resource_list.append("DATA")
+    session_label = get_session_label(assessor_id, experiment_id)
+    if session_label is not None:
+        # download each folder
+        # send it the log files too
+        resource_list = []
+        if download_snaps or download_all:
+            resource_list.append("SNAPSHOTS")
+        if download_logs or download_all:
+            resource_list.append("LOG")
+        if download_all or download_annot or download_area or download_avg_curv or download_bak or download_cmd or download_crv or download_csurfdir or download_ctab or download_curv or download_dat or download_defect_borders or download_defect_chull or download_defect_labels or download_done or download_env or download_H or download_inflated or download_jacobian_white or download_K or download_label or download_local_copy or download_logs or download_lta or download_m3z or download_mgh or download_mgz or download_mid or download_nofix or download_old or download_orig or download_pial or download_reg or download_smoothwm or download_sphere or download_stats or download_sulc or download_thickness or download_touch or download_txt or download_volume or download_white or download_xdebug_mris_calc or download_xfm:
+            resource_list.append("DATA")
 
-    if not os.path.exists(destination):
-        os.makedirs(destination)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
 
-    for resource_name in resource_list:
-        folder_path = os.path.join(destination, assessor_id)
-        resource_folder_path = os.path.join(folder_path, resource_name)
+        for resource_name in resource_list:
+            folder_path = os.path.join(destination, session_label, assessor_id)
+            resource_folder_path = os.path.join(folder_path, resource_name)
 
-        zip_filename = assessor_id + '_' + resource_name + '.zip'
+            zip_filename = assessor_id + '_' + resource_name + '.zip'
 
-        download_result_code = download_resource_contents(experiment_id, assessor_id, destination, zip_filename, resource_name)
+            download_result_code = download_resource_contents(experiment_id, assessor_id, destination, zip_filename, resource_name)
 
-        if (str(download_result_code) == "200") and zipfile.is_zipfile(os.path.join(destination, zip_filename)):
-            print(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.")        
-            if create_logs:
-                log_file.write(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.\n")
-            # Make the DATA/SNAPSHOTS/LOGS dir if it doesn't exist yet
-            if not os.path.exists(resource_folder_path):
-                os.makedirs(resource_folder_path)
-            extract_requested_files(os.path.join(destination, zip_filename), resource_folder_path, resource_name)
-            os.remove(os.path.join(destination, zip_filename))
-        elif (str(download_result_code) != "200"):
-            print(assessor_id + ": Error code " + str(download_result_code) + " when attempting to download FreeSurfer " + assessor_id + " resource " + resource_name + ".")
-            if create_logs:
-                log_file.write(assessor_id + ": Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
-        else:
-            print(assessor_id + ": Downloaded an invalid zip file for FreeSurfer " + assessor_id + ", resource " + resource_name + ".")
-            if create_logs:
-                log_file.write(assessor_id + ": Downloaded an invalid zip file " + zip_filename + " for resource " + resource_name + ".\n")
+            if (str(download_result_code) == "200") and zipfile.is_zipfile(os.path.join(destination, zip_filename)):
+                print(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.")        
+                if create_logs:
+                    log_file.write(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.\n")
+                # Make the DATA/SNAPSHOTS/LOGS dir if it doesn't exist yet
+                if not os.path.exists(resource_folder_path):
+                    os.makedirs(resource_folder_path)
+                extract_requested_files(os.path.join(destination, zip_filename), resource_folder_path, resource_name)
+                os.remove(os.path.join(destination, zip_filename))
+                if create_logs:
+                    log_file.write(assessor_id + ": Successfully unzipped zip file for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Files from " + resource_name + " resource downloaded successfully.\n")
+            elif (str(download_result_code) != "200"):
+                print(assessor_id + ": Error code " + str(download_result_code) + " when attempting to download FreeSurfer " + assessor_id + " resource " + resource_name + ".")
+                if create_logs:
+                    log_file.write(assessor_id + ": Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
+            else:
+                print(assessor_id + ": Downloaded an invalid zip file for FreeSurfer " + assessor_id + ", resource " + resource_name + ".")
+                if create_logs:
+                    log_file.write(assessor_id + ": Downloaded an invalid zip file " + zip_filename + " for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Got invalid zip file for resource " + resource_name + ".\n")
+    else:
+        print("Problem pulling label for Session ID " + experiment_id + " (Freesurfer ID " + assessor_id + ")")
+        if create_logs:
+            log_file.write(assessor_id + ": Problem pulling label for Session ID " + experiment_id + ".\n")
+            log_file_catalog.write(experiment_id + ",," + assessor_id + ",Could not pull Session Label from Session ID.\n")
 
-
-# start the main thing
-
-# write a date/time row to the log because why not
+# Start the main block
 print("Script started at " + str(datetime.datetime.now()))
 if create_logs:
     log_file.write("Script started at " + str(datetime.datetime.now()) + "\n")
@@ -559,18 +610,34 @@ while num_password_retries <= 3:
                 csv_reader = csv.reader(csvfile, delimiter=',')
 
                 for row in csv_reader:
-                    # get the row data
+                    # get the assessor ID from the row data
                     assessor_id = row[0]
 
+                    if create_logs:
+                        log_file.write("Getting started with FreeSurfer " + assessor_id + ".\n")
+
+                    # download the single Freesurfer based on assessor ID
                     download_one_fs(assessor_id)
 
+                    if create_logs:
+                        log_file.write("Done with FreeSurfer " + assessor_id + ".\n")
+
         elif fs_id_to_download is not None and sessions_csv is None:
+            # assessor ID came from input to the script - with the --id flag.
             assessor_id = fs_id_to_download
 
-            download_one_fs(assessor_id) 
-        else:
-            print(
-                "You must include either a csv of FreeSurfer ids to download, or specify a single FreeSurfer ID using the --id flag.")
+            if create_logs:
+                log_file.write("Getting started with FreeSurfer " + assessor_id + ".\n")
 
+            # download the single Freesurfer based on assessor ID
+            download_one_fs(assessor_id)
+
+            if create_logs:
+                log_file.write("Done with FreeSurfer " + assessor_id + ".\n")
+        else:
+            print("You must include either a csv of FreeSurfer ids to download, or specify a single FreeSurfer ID using the --id flag.")
         close_xnat_session()
+        print("Download FreeSurfers script is completed.")
+        if create_logs:
+            print('See download_freesurfer_catalog_' + timestamp_log_base + '.csv for a list of the FreeSurfer resources that were downloaded.')
     break

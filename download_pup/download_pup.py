@@ -1,4 +1,4 @@
-downl#!/bin/env python
+#!/bin/env python
 
 #================================================================
 # Required python packages:
@@ -20,7 +20,7 @@ import requests
 #
 # Author: Sarah Keefe
 # Contributors: Austin McCullough, Rick Herrick
-# Date Updated: 11/13/2020
+# Date Updated: 11/18/2020
 #
 # Written using python version 3.6
 #
@@ -44,21 +44,20 @@ import requests
 # - p <secret>: Replace <secret> with the token next to the text "secret:" found on https://cnda.wustl.edu/data/services/tokens/issue
 #
 # Choose one of these flags to read from a CSV of PUP IDs, or specify a single PUP ID:
-# -c filename.csv or --
-# -csv filename.csv to read from a CSV of PUP IDs with no header row (specify filename.csv)
+# -c filename.csv or 
+# --csv filename.csv to read from a CSV of PUP IDs with no header row (specify filename.csv)
 # -i pup_id or --id pup_id to download for a single PUP ID (specify pup_id)
 #
 # Output:
 # Organizes the files into the following folder structure: 
-# ${pup_id}/DATA
-# ${pup_id}/SNAPSHOTS
-# ${pup_id}/LOG
+# destination_dir/${session_label}/${pup_id}/DATA/pet_proc
+# destination_dir/${session_label}/${pup_id}/SNAPSHOTS
+# destination_dir/${session_label}/${pup_id}/LOG
 #
 # If the --create-logs flag is included:
-# Creates a log file at `download_pup.log` - contains all output from the script.
-# Creates a log file at `to_download_manually_pup.log` - contains a list of all PUP IDs that could not be found.
-# Creates a log file at `to_download_manually_pup_files.log` - contains a list of all files that could not be downloaded 
-# and their PUP IDs (in the format pup_id, filename).
+# Creates a log file at `download_pup_${timestamp}.log` - contains all output from the script.
+# Creates a log file at `download_freesurfer_catalog_${timestamp}.log` - contains PUPs from your original list, 
+#     specifying which resources were downloaded successfully, and which failed to download.
 #================================================================
 #
 #
@@ -198,11 +197,12 @@ timestamp_log_base = str(calendar.timegm(datetime.datetime.now().timetuple()))
 
 # create a log file to write to
 if create_logs:
-    log_file = open('download_pup_log_' + timestamp_log_base + '.log', 'w')
-    log_file_missing_pups = open('not_downloaded_pup_resources_' + timestamp_log_base + '.log', 'w')
+    log_file = open('download_pup_' + timestamp_log_base + '.log', 'w')
+    log_file_catalog = open('download_pup_catalog_' + timestamp_log_base + '.csv', 'w')
+    log_file_catalog.write("Session ID,Session Label,PUP ID,Download Information\n")
 else:
     log_file = None
-    log_file_missing_pups = None
+    log_file_catalog = None
 
 session = requests.Session()
 credentials = (user, password)
@@ -212,8 +212,8 @@ parameters = {}
 auth_url = site + "/data/JSESSION"
 
 
+# Close the XNAT connection
 def close_xnat_session():
-    # Close the XNAT connection
     try:
         closed = session.delete(auth_url)
         closed.raise_for_status()
@@ -222,6 +222,50 @@ def close_xnat_session():
     else:
         print("XNAT user session has been closed.")
 
+
+# Pull the session label for the given session ID from XNAT using the XNAT API
+def get_session_label(assessor_id, session_id):
+    # log that we are checking for the session
+    print(assessor_id + ": Pulling session label for session " + session_id + ".")
+    if create_logs:
+        log_file.write(assessor_id + ": Pulling session label for session " + session_id + ".\n")
+
+    # Pull session label using XNAT API
+    sess_label_url = site + '/data/experiments?ID=' + session_id + '&columns=label&format=csv'
+    print(assessor_id + ": Checking session info at URL: " + sess_label_url)
+    if create_logs:
+        log_file.write(assessor_id + ": Checking session info at URL:  " + sess_label_url + "\n")
+    try:
+        response = session.get(sess_label_url, params=parameters, headers=headers)
+        if response.encoding is None:
+            response.encoding = 'utf-8'
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as session_infopull_error:
+        if session_infopull_error.response.status_code == 404:
+            # No session found with this id
+            print(assessor_id + ": Session ID " + session_id + " does not exist or can't be found.")
+            if create_logs:
+                log_file.write(assessor_id + ": Session " + session_id + " does not exist or can't be found.\n")
+                log_file_catalog.write(session_id + ",,,Parent session not found\n")
+            return None
+        else:
+            print(assessor_id + ": Error code " + str(session_infopull_error.response.status_code) + " when pulling session info for session " + session_id + ".")
+            if create_logs:
+                log_file.write(assessor_id + ": Error code " + str(session_infopull_error.response.status_code) + " when pulling session info for session " + session_id + ".\n")
+                log_file_catalog.write(session_id + ",,,Parent session error code" + str(session_infopull_error.response.status_code) + "\n")
+            return None
+    else:
+        session_label = None
+        # Get the session label from the JSON result
+        label_csv_contents = response.iter_lines(decode_unicode=True)
+        label_info_reader = csv.reader(label_csv_contents, delimiter=",")
+        for info_row in label_info_reader:
+            if info_row[0] != "ID":
+                session_label = info_row[1]
+        return session_label
+
+
+# Download a file to folder_path/filename from a requests response
 def download_file(folder_path, filename, response, block_sz):
     # from https://stackoverflow.com/a/22776
     # download file in chunks in case it is too large
@@ -245,6 +289,7 @@ def download_file(folder_path, filename, response, block_sz):
     f.close()
 
 
+# extract files from a zip file based on the flags sent to the script
 def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
     pupzip = zipfile.ZipFile(zip_file_path) 
     for subfile in pupzip.namelist():
@@ -318,16 +363,15 @@ def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
 
             # get the new file basename and cut the filename off the end of it
             # need to create this directory before we can move the downloaded file to it
-            new_file_location=new_file_base.rsplit("/",1)[0]
-            #print(os.path.join(resource_folder_path,new_file_location))
+            new_file_location = ""
+            if (new_file_base.count('/') > 0):
+                new_file_location = new_file_base.rsplit("/",1)[0]
+
             if not os.path.exists(os.path.join(resource_folder_path,new_file_location)):
-                #print("making directory: " + os.path.join(resource_folder_path,new_file_location))
                 os.makedirs(os.path.join(resource_folder_path,new_file_location))
 
-            #print(os.path.join(resource_folder_path,subfilename))
-            #print(os.path.join(resource_folder_path,new_file_base))
             print("Moving file " + new_file_base + " from zipfile subdirectory into main resource directory.")
-            shutil.move(os.path.join(resource_folder_path,subfilename),os.path.join(resource_folder_path,new_file_base))
+            shutil.move(os.path.join(resource_folder_path,subfilename),os.path.join(resource_folder_path,new_file_location))
 
             # Get the first foldername in the resource folder path - this folder structure is now empty so we can remove it.
             first_folder_path_arr=subfilename.split("/",1)
@@ -335,11 +379,13 @@ def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
             shutil.rmtree(os.path.join(resource_folder_path,first_folder_path))
 
 
+# download the contents of an XNAT resource folder for a given assessor
+# A resource folder is named "DATA", "LOG", or "SNAPSHOTS"
 def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, resource_name):
     # log that we are checking for the session
-    print("Checking for session " + dl_assessor + " folder " + resource_name + ".")
+    print(assessor_id + ": Checking for session " + dl_assessor + " folder " + resource_name + ".")
     if create_logs:
-        log_file.write("Checking for session " + dl_assessor + " folder " + resource_name + ".\n")
+        log_file.write(assessor_id + ": Checking for session " + dl_assessor + " folder " + resource_name + ".\n")
 
     # Download all files for this folder
     resource_contents_url = site + '/data/experiments/' + dl_expt + '/assessors/' + dl_assessor + '/resources/' + resource_name + \
@@ -359,19 +405,20 @@ def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, reso
             print("resource type " + resource_name + "for PUP ID " + dl_assessor + " does not exist or can't be found.")
             if create_logs:
                 log_file.write("PUP " + dl_assessor + " resource " + resource_name + " does not exist or can't be found.\n")
-                log_file_missing_pups.write(dl_assessor + "," + resource_name + "\n")
             return files_download_error.response.status_code
         else:
             print("Error code " + str(files_download_error.response.status_code) + " when searching for PUP " + dl_assessor + ".")
             if create_logs:
                 log_file.write("Error code " + str(files_download_error.response.status_code) + " when searching for PUP " + dl_assessor + ".\n")
-                log_file_missing_pups.write(dl_assessor + "," + resource_name + "\n")
             return files_download_error.response.status_code
     else:
         download_file(folder_path, filename, response, 8192)
         return response.status_code
 
 
+# Download a single PUP based on a given assessor ID
+# Pulls the experiment ID for the main session from the assessor
+# Determines which resource to download from based on the flags sent to the main script
 def download_one_pup(assessor_id):
 
     # split up the PUP ID to get the PET accession number (experiment_id)
@@ -383,48 +430,59 @@ def download_one_pup(assessor_id):
     if create_logs:
         log_file.write(assessor_id + ": Got experiment ID: " + experiment_id + ". \n")
 
-    # download each folder
-    # send it the log files too
-    resource_list = []
-    if download_snaps or download_all:
-        resource_list.append("SNAPSHOTS")
-    if download_logs or download_all:
-        resource_list.append("LOG")
-    if download_all or download_4dfp or download_dat or download_info or download_logs or download_lst \
-            or download_mgz or download_moco or download_nii or download_params or download_sub or \
-            download_suvr or download_tac or download_tb or download_txt or download_SUVR4dfp or \
-            download_T10014dfp or download_PETFOV or download_RSFMask or download_no_ext or download_wmparc:
-        resource_list.append("DATA")
+    session_label = get_session_label(assessor_id, experiment_id)
+    if session_label is not None:
+        # download each folder
+        # send it the log files too
+        resource_list = []
+        if download_snaps or download_all:
+            resource_list.append("SNAPSHOTS")
+        if download_logs or download_all:
+            resource_list.append("LOG")
+        if download_all or download_4dfp or download_dat or download_info or download_logs or download_lst \
+                or download_mgz or download_moco or download_nii or download_params or download_sub or \
+                download_suvr or download_tac or download_tb or download_txt or download_SUVR4dfp or \
+                download_T10014dfp or download_PETFOV or download_RSFMask or download_no_ext or download_wmparc:
+            resource_list.append("DATA")
 
-    if not os.path.exists(destination):
-        os.makedirs(destination)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
 
-    for resource_name in resource_list:
-        folder_path = os.path.join(destination, assessor_id)
-        resource_folder_path = os.path.join(folder_path, resource_name)
+        for resource_name in resource_list:
+            folder_path = os.path.join(destination, session_label, assessor_id)
+            resource_folder_path = os.path.join(folder_path, resource_name)
 
-        zip_filename = assessor_id + '_' + resource_name + '.zip'
+            zip_filename = assessor_id + '_' + resource_name + '.zip'
 
-        download_result_code = download_resource_contents(experiment_id, assessor_id, destination, zip_filename, resource_name)
+            download_result_code = download_resource_contents(experiment_id, assessor_id, destination, zip_filename, resource_name)
 
-        if (str(download_result_code) == "200") and zipfile.is_zipfile(os.path.join(destination, zip_filename)):
-            print(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.")        
-            if create_logs:
-                log_file.write(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.\n")
-            # Make the DATA/SNAPSHOTS/LOGS dir if it doesn't exist yet
-            if not os.path.exists(resource_folder_path):
-                os.makedirs(resource_folder_path)
-            extract_requested_files(os.path.join(destination, zip_filename), resource_folder_path, resource_name)
-            os.remove(os.path.join(destination, zip_filename))
-        elif (str(download_result_code) != "200"):
-            print(assessor_id + ": Error code " + str(download_result_code) + " when attempting to download PUP " + assessor_id + " resource " + resource_name + ".")
-            if create_logs:
-                log_file.write(assessor_id + ": Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
-        else:
-            print(assessor_id + ": Downloaded an invalid zip file for PUP " + assessor_id + ", resource " + resource_name + ".")
-            if create_logs:
-                log_file.write(assessor_id + ": Downloaded an invalid zip file " + zip_filename + " for resource " + resource_name + ".\n")
-
+            if (str(download_result_code) == "200") and zipfile.is_zipfile(os.path.join(destination, zip_filename)):
+                print(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.")        
+                if create_logs:
+                    log_file.write(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.\n")
+                # Make the DATA/SNAPSHOTS/LOGS dir if it doesn't exist yet
+                if not os.path.exists(resource_folder_path):
+                    os.makedirs(resource_folder_path)
+                extract_requested_files(os.path.join(destination, zip_filename), resource_folder_path, resource_name)
+                os.remove(os.path.join(destination, zip_filename))
+                if create_logs:
+                    log_file.write(assessor_id + ": Successfully unzipped zip file for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Files from " + resource_name + " resource downloaded successfully.\n")
+            elif (str(download_result_code) != "200"):
+                print(assessor_id + ": Error code " + str(download_result_code) + " when attempting to download PUP " + assessor_id + " resource " + resource_name + ".")
+                if create_logs:
+                    log_file.write(assessor_id + ": Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Error code " + str(download_result_code) + " for resource " + resource_name + ".\n")
+            else:
+                print(assessor_id + ": Downloaded an invalid zip file for PUP " + assessor_id + ", resource " + resource_name + ".")
+                if create_logs:
+                    log_file.write(assessor_id + ": Downloaded an invalid zip file " + zip_filename + " for resource " + resource_name + ".\n")
+                    log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Got invalid zip file for resource " + resource_name + ".\n")
+    else:
+        print("Problem pulling label for Session ID " + experiment_id + " (PUP ID " + assessor_id + ")")
+        if create_logs:
+            log_file.write(assessor_id + ": Problem pulling label for Session ID " + experiment_id + ".\n")
+            log_file_catalog.write(experiment_id + ",," + assessor_id + ",Could not pull Session Label from Session ID.\n")
 
 # start the main thing
 
@@ -473,18 +531,33 @@ while num_password_retries <= 3:
                 csv_reader = csv.reader(csvfile, delimiter=',')
 
                 for row in csv_reader:
-                    # get the row data
+                    # get the assessor ID from the row data
                     assessor_id = row[0]
 
+                    if create_logs:
+                        log_file.write("Getting started with PUP " + assessor_id + ".\n")
+
+                    # download the single Freesurfer based on assessor ID
                     download_one_pup(assessor_id)
+
+                    if create_logs:
+                        log_file.write("Done with PUP " + assessor_id + ".\n")
 
         elif pup_id_to_download is not None and sessions_csv is None:
             assessor_id = pup_id_to_download
 
-            download_one_pup(assessor_id) 
-        else:
-            print(
-                "You must include either a csv of PUP ids to download, or specify a single PUP ID using the --id flag.")
+            if create_logs:
+                log_file.write("Getting started with PUP " + assessor_id + ".\n")
 
+            # download the single Freesurfer based on assessor ID
+            download_one_pup(assessor_id)
+
+            if create_logs:
+                log_file.write("Done with PUP " + assessor_id + ".\n")
+        else:
+            print("You must include either a csv of PUP ids to download, or specify a single PUP ID using the --id flag.")
         close_xnat_session()
+        print("Download PUP script is completed.")
+        if create_logs:
+            print('See download_pup_catalog_' + timestamp_log_base + '.csv for a list of the PUP resources that were downloaded.')
     break
