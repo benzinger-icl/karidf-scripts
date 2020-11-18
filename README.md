@@ -76,7 +76,7 @@ This script downloads all or a specificed type of MR and PET.
 
 **Required inputs:**
 
-`<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id (e.g. CNDA_E12345) without a header.
+`<input_file.csv>` - A Unix formatted, comma-separated file containing a column for experiment_id/accession (e.g. CNDA_E12345) without a header.
 
 `<scan_type>` - The scan type of the scan you want to download. (e.g. T1w, angio, bold, fieldmap, FLAIR). You must include all scan names listed for the specific scan type scans (for example, T1 scans can be named as MPRAGE, SAG T1 MPRAGE, Accelerated Sagittal MPRAGE, etc).  The scan names vary depending on sessions. You can also enter multiple scan types in the file. (e.g. T2w,swi,bold). Without this argument, all scans for the given experiment_id will be downloaded.
 
@@ -90,7 +90,7 @@ This script downloads all or a specificed type of MR and PET.
  
 **Example Usage**
 
-1. Create a csv containing experiment_id without a header.
+1. Create a csv containing experiment_id/accession without a header.
 
 scan_to_download.csv example:
 
@@ -155,7 +155,7 @@ python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias
 
 `<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
 
-`<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
+`<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (FS_ID) (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
 
 `<alias>`: Obtain alias token using the instructions under "XNAT token"
   
@@ -257,7 +257,7 @@ Include any of the following optional flags to only download particular filetype
  
 **Example Usage**
 
-1. Create a csv containing FreeSurfer IDs without a header.
+1. Create a csv containing FreeSurfer IDs (FS_ID) without a header.
 
 download_freesurfer_list.csv example:
 
@@ -328,7 +328,7 @@ python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <
 
 `<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
 
-`<pup_ids.csv>` - A Unix formatted, comma-separated file containing a column for PUP IDs (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345) without a header.
+`<pup_ids.csv>` - A Unix formatted, comma-separated file containing a column for PUP IDs (PUP_ID) (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345) without a header.
 
 `<alias>`: Obtain alias token using the instructions under "XNAT token"
   
@@ -387,7 +387,7 @@ Include any of the following optional flags to only download particular filetype
  
 **Example Usage**
 
-1. Create a csv containing PUP IDs without a header.
+1. Create a csv containing PUP IDs (PUP_ID) without a header.
 
 download_pup_list.csv example:
 
