@@ -49,7 +49,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 
 2. Extract the .zip file onto your local computer and move the desired script (ex. download_freesurfer.py) into the folder you will be working from.
 
-3. Download / create CSV files necessary to run scripts.  The required csv's are explained in the next sub-section below.
+3. Download / create CSV files necessary to run scripts.
 
 4. Move the csv file(s) into the same folder as the script.
 
