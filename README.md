@@ -3,11 +3,11 @@
 - [Prerequisites - Please Read](#prerequisites---please-read)
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
-- [Instructions on running scripts](#instructions-on-running-scripts)
+- [General instructions on running scripts](#general-instructions-on-running-scripts)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
-- [Contact information](#contact-information)
+- [Additional help with scripts?](#additional-help-with-scripts?)
 
 <br>
 <br>
@@ -43,7 +43,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 <br>
 <br>
 
-# Instructions on running scripts
+# General instructions on running scripts
 
 1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
 
@@ -428,6 +428,6 @@ pup_id/LOG
 
 
 
-# Contact information
+# Additional help with scripts?
 
-If you have any questions regarding the scripts in this repository, please contact Christine Pulizos at pulizosc@wustl.edu.
+Please submit your question or concern in the issues section on this repository, thank you!
