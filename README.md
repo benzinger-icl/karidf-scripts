@@ -3,11 +3,11 @@
 - [Prerequisites - Please Read](#prerequisites---please-read)
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
-- [Instructions on running scripts](#instructions-on-running-scripts)
+- [General instructions on running scripts](#general-instructions-on-running-scripts)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
-- [Contact information](#contact-information)
+- [Additional help with scripts?](#additional-help-with-scripts)
 
 <br>
 <br>
@@ -49,7 +49,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 
 2. Extract the .zip file onto your local computer and move the desired script (ex. download_freesurfer.py) into the folder you will be working from.
 
-3. Download / create CSV files necessary to run scripts.  The required csv's are explained in the next sub-section below.
+3. Download / create CSV files necessary to run scripts.
 
 4. Move the csv file(s) into the same folder as the script.
 
@@ -102,7 +102,7 @@ If you only have one session you need to download scans for, you can use the `-i
  
 **Example Usage**
 
-1. Create a csv containing experiment_id without a header.
+1. Create a csv containing experiment_id/accession without a header.
 
 session_ids.csv example:
 
@@ -169,7 +169,7 @@ python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias
 
 `<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
 
-`<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
+`<fs_ids.csv>` - A Unix formatted, comma-separated file containing a column for FreeSurfer IDs (FS_ID) (e.g. CNDA_E12345_freesurfer_2017101912345) without a header.
 
 `<alias>`: Obtain alias token using the instructions under "XNAT token"
   
@@ -275,7 +275,7 @@ Include any of the following optional flags to only download particular filetype
  
 **Example Usage**
 
-1. Create a csv containing FreeSurfer IDs without a header.
+1. Create a csv containing FreeSurfer IDs (FS_ID) without a header.
 
 download_freesurfer_list.csv example:
 
@@ -346,7 +346,7 @@ python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <
 
 `<destination_dir>` - A directory path (relative or absolute) to save the files to. If this directory doesn't exist when you run the script, it will be created automatically.
 
-`<pup_ids.csv>` - A Unix formatted, comma-separated file containing a column for PUP IDs (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345) without a header.
+`<pup_ids.csv>` - A Unix formatted, comma-separated file containing a column for PUP IDs (PUP_ID) (e.g. CNDA_E12345_PUPTIMECOURSE_2017101912345) without a header.
 
 `<alias>`: Obtain alias token using the instructions under "XNAT token"
   
@@ -408,7 +408,7 @@ Include any of the following optional flags to only download particular filetype
  
 **Example Usage**
 
-1. Create a csv containing PUP IDs without a header.
+1. Create a csv containing PUP IDs (PUP_ID) without a header.
 
 download_pup_list.csv example:
 
