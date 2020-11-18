@@ -1,6 +1,7 @@
 # Table of Contents
 - [KARI data freeze scripts overview](#kari-data-freeze-scripts-overview)
 - [Prerequisites - Please Read](#prerequisites---please-read)
+  * [Python 3](#python-3)
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
 - [General instructions on running these scripts](#general-instructions-on-running-these-scripts)
@@ -19,7 +20,7 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 <br>
 
 # Prerequisites - Please Read
-## Python 3 Installation
+## Python 3
 
 In order to run these scripts you will need to have Python 3 installed on your machine. 
 
