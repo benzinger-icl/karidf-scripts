@@ -19,13 +19,24 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 <br>
 
 # Prerequisites - Please Read
+## Python 3 Installation
+
+In order to run these scripts you will need to have Python 3 installed on your machine. 
+
+Windows users may want to use [Anaconda](https://www.anaconda.com/products/individual#Downloads). Detailed instructions on how to run this script using Anaconda on Windows will be posted soon.
+
 ## Python packages
 
-The python package *requests* is required to run any of the scripts in this repository.
+The python3 package *requests* is required to run any of the scripts in this repository.
 
 To install, run the following command in your terminal:
 ```
 python -m pip install requests
+```
+
+If you do this and still get an error message that there is "No module named requests" when running the script, you may need to install python3-requests this way:
+```
+apt-get install python3-requests
 ```
 
 ## XNAT Tokens
