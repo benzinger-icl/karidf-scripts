@@ -3,11 +3,11 @@
 - [Prerequisites - Please Read](#prerequisites---please-read)
   * [Python packages](#python-packages)
   * [XNAT Tokens](#xnat-tokens)
-- [General instructions on running scripts](#general-instructions-on-running-scripts)
+- [General instructions on running these scripts](#general-instructions-on-running-these-scripts)
 - [Downloading MR and PET scan files](#downloading-mr-and-pet-scan-files)
 - [Downloading FreeSurfer files](#downloading-freesurfer-files)
 - [Downloading PUP files](#downloading-pup-files)
-- [Additional help with scripts?](#additional-help-with-scripts)
+- [Need additional help running these scripts?](#need-additional-help-running-these-scripts)
 
 <br>
 <br>
@@ -21,7 +21,7 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 # Prerequisites - Please Read
 ## Python packages
 
-The python package, requests, is required to run any of the scripts in this repository.
+The python package *requests* is required to run any of the scripts in this repository.
 
 To install, run the following command in your terminal:
 ```
@@ -43,7 +43,7 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 <br>
 <br>
 
-# Instructions on running these scripts
+# General instructions on running these scripts
 
 1. Download the script from this Github repository by clicking "Clone or download" and choose Download ZIP. This will download a zip file containing all the scripts in the repository and this README file.
 
@@ -106,7 +106,6 @@ If you only have one session you need to download scans for, you can use the `-i
 
 session_ids.csv example:
 
-||
 |-------------|
 | CNDA_E71543 |
 | CNDA_E1594  |
@@ -117,7 +116,6 @@ session_ids.csv example:
 
 requested_scan_types.csv example:
 
-||
 |-------------|
 | SAG 3D FSPGR |
 | MPRAGE GRAPPA2  |
@@ -279,7 +277,6 @@ Include any of the following optional flags to only download particular filetype
 
 download_freesurfer_list.csv example:
 
-||
 |-------------|
 | CNDA_E12345_freesurfer_2017101912345 |
 | CNDA_E57844_freesurfer_2019102112345  |
@@ -412,7 +409,6 @@ Include any of the following optional flags to only download particular filetype
 
 download_pup_list.csv example:
 
-||
 |-------------|
 | CNDA_E12345_PUPTIMECOURSE_2017101912345 |
 | CNDA_E57844_PUPTIMECOURSE_2019102112345  |
