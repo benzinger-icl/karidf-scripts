@@ -12,6 +12,8 @@ import time
 import zipfile
 import shutil
 import requests
+from pathlib import Path
+
 #================================================================
 
 #================================================================
@@ -182,7 +184,7 @@ fs_id_to_download = args.id
 site = args.site
 user = args.user
 if user is None:
-    user = raw_input("Enter your username for " + site + ": ")
+    user = input("Enter your username for " + site + ": ")
 password = args.password
 if password is None:
     password = getpass.getpass("Enter your password for " + site + ": ")
@@ -316,7 +318,7 @@ def get_session_label(assessor_id, session_id):
 def download_file(folder_path, filename, response, block_sz):
     # from https://stackoverflow.com/a/22776
     # download file in chunks in case it is too large
-    f = open(os.path.join(folder_path, filename), 'wb')
+    f = open(Path(folder_path, filename), 'wb')
     if "content-length" in response.headers:
         file_size = int(response.headers["Content-Length"])
     else:
@@ -336,134 +338,139 @@ def download_file(folder_path, filename, response, block_sz):
     f.close()
 
 
+# recursively remove a set of directories (empty) in pathlib
+def rm_tree(pth: Path):
+    for child in pth.iterdir():
+        if child.is_file():
+            child.unlink()
+        else:
+            rm_tree(child)
+    pth.rmdir()
+
+
 # extract files from a zip file based on the flags sent to the script
 def extract_requested_files(zip_file_path, resource_folder_path, resource_name):
-    fszip = zipfile.ZipFile(zip_file_path) 
-    for subfile in fszip.namelist():
+    fszip = zipfile.ZipFile(zip_file_path)
+    resource_folder_path=Path(resource_folder_path)
+    with fszip as z:
+        for subfile in z.namelist():
+    
+            subfilename = z.getinfo(subfile).filename
 
-        subfilename = fszip.getinfo(subfile).filename
+            subfilename_split = subfilename.split(".")
 
-        subfilename_split = subfilename.split(".")
+            download_this_file = False
 
-        download_this_file = False
+            if download_all:
+                # download all if none of the specific download flags are specified
+                download_this_file = True
+            elif download_logs and resource_name == "LOG":
+                download_this_file = True
+            elif download_snaps and resource_name == "SNAPSHOTS":
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'annot' and download_annot:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'area' and download_area:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'avg_curv' and download_avg_curv:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'bak' and download_bak:
+                download_this_file = True             
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'cmd' and download_cmd:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'crv' and download_crv:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'csurfdir' and download_csurfdir:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'ctab' and download_ctab:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'curv' and download_curv:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'dat' and download_dat:
+                download_this_file = True             
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_borders' and download_defect_borders:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_chull' and download_defect_chull:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_labels' and download_defect_labels:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'env' and download_env:
+                download_this_file = True                         
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'H' and download_H:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'inflated' and download_inflated:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'jacobian_white' and download_jacobian_white:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'K' and download_K:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'label' and download_label:
+                download_this_file = True                         
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'local-copy' and download_local_copy:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'log' and download_logs:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'lta' and download_lta:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'm3z' and download_m3z:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mgh' and download_mgh:
+                download_this_file = True                         
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mgz' and download_mgz:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mid' and download_mid:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'nofix' and download_nofix:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'old' and download_old:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'orig' and download_orig:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'pial' and download_pial:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'reg' and download_reg:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'smoothwm' and download_smoothwm:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'sphere' and download_sphere:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'stats' and download_stats:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'sulc' and download_sulc:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'thickness' and download_thickness:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'touch' and download_touch:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'txt' and download_txt:
+                download_this_file = True
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'volume' and download_volume:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'white' and download_white:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'xdebug_mris_calc' and download_xdebug_mris_calc:
+                download_this_file = True 
+            elif len(subfilename_split) > 1 and subfilename_split[-1] == 'xfm' and download_xfm:
+                download_this_file = True                                                                                 
 
-        if download_all:
-            # download all if none of the specific download flags are specified
-            download_this_file = True
-        elif download_logs and resource_name == "LOG":
-            download_this_file = True
-        elif download_snaps and resource_name == "SNAPSHOTS":
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'annot' and download_annot:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'area' and download_area:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'avg_curv' and download_avg_curv:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'bak' and download_bak:
-            download_this_file = True             
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'cmd' and download_cmd:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'crv' and download_crv:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'csurfdir' and download_csurfdir:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'ctab' and download_ctab:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'curv' and download_curv:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'dat' and download_dat:
-            download_this_file = True             
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_borders' and download_defect_borders:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_chull' and download_defect_chull:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'defect_labels' and download_defect_labels:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'env' and download_env:
-            download_this_file = True                         
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'H' and download_H:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'inflated' and download_inflated:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'jacobian_white' and download_jacobian_white:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'K' and download_K:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'label' and download_label:
-            download_this_file = True                         
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'local-copy' and download_local_copy:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'log' and download_logs:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'lta' and download_lta:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'm3z' and download_m3z:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mgh' and download_mgh:
-            download_this_file = True                         
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mgz' and download_mgz:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'mid' and download_mid:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'nofix' and download_nofix:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'old' and download_old:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'orig' and download_orig:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'pial' and download_pial:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'reg' and download_reg:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'smoothwm' and download_smoothwm:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'sphere' and download_sphere:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'stats' and download_stats:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'sulc' and download_sulc:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'thickness' and download_thickness:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'touch' and download_touch:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'txt' and download_txt:
-            download_this_file = True
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'volume' and download_volume:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'white' and download_white:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'xdebug_mris_calc' and download_xdebug_mris_calc:
-            download_this_file = True 
-        elif len(subfilename_split) > 1 and subfilename_split[-1] == 'xfm' and download_xfm:
-            download_this_file = True                                                                                 
-
-        if download_this_file:
-            # extract the file
-            print("Extracting file: " + subfilename)
-            fszip.extract(subfilename, resource_folder_path)
-
-            # get the folder name after resources/DATA/files (or whatever the resource name is)
-            new_file_base_arr=subfilename.split("resources/" + resource_name + "/files/",1)
-            new_file_base=new_file_base_arr[1]
-
-            # get the new file basename and cut the filename off the end of it
-            # need to create this directory before we can move the downloaded file to it
-            new_file_location = ""
-            if (new_file_base.count('/') > 0):
-                new_file_location = new_file_base.rsplit("/",1)[0]
-
-            if not os.path.exists(os.path.join(resource_folder_path,new_file_location)):
-                os.makedirs(os.path.join(resource_folder_path,new_file_location))
-
-            print("Moving file " + new_file_base + " from zipfile subdirectory into main resource directory.")
-            shutil.move(os.path.join(resource_folder_path,subfilename),os.path.join(resource_folder_path,new_file_location))
-
-            # Get the first foldername in the resource folder path - this folder structure is now empty so we can remove it.
-            first_folder_path_arr=subfilename.split("/",1)
-            first_folder_path=first_folder_path_arr[0]            
-            shutil.rmtree(os.path.join(resource_folder_path,first_folder_path))
+            if download_this_file:
+                # extract the file
+                
+                # get the folder name after resources/DATA/files (or whatever the resource name is)
+                new_file_base_arr=subfilename.split("resources/" + resource_name + "/files/",1)
+                new_file_base=new_file_base_arr[1]            
+                
+                final_file_path = Path(resource_folder_path, new_file_base)
+                
+                if not final_file_path.parent.exists():
+                    final_file_path.parent.mkdir(parents=True, exist_ok=True)            
+                
+                #print(str(final_file_path))
+                
+                print("Extracting file: " + subfilename)
+                        
+                with z.open(subfilename) as zf, open(final_file_path, 'wb') as f:
+                    shutil.copyfileobj(zf, f)
 
 
 # download the contents of an XNAT resource folder for a given assessor
@@ -503,7 +510,7 @@ def download_resource_contents(dl_expt, dl_assessor, folder_path, filename, reso
 # Download a single Freesurfer based on a given assessor ID
 # Pulls the experiment ID for the main session from the assessor
 # Determines which resource to download from based on the flags sent to the main script
-def download_one_fs(assessor_id):
+def download_one_fs(assessor_id, destination):
 
     # split up the FreeSurfer ID to get the PET accession number (experiment_id)
     experiment_id_arr = assessor_id.split("_freesurfer_")
@@ -526,26 +533,30 @@ def download_one_fs(assessor_id):
         if download_all or download_annot or download_area or download_avg_curv or download_bak or download_cmd or download_crv or download_csurfdir or download_ctab or download_curv or download_dat or download_defect_borders or download_defect_chull or download_defect_labels or download_done or download_env or download_H or download_inflated or download_jacobian_white or download_K or download_label or download_local_copy or download_logs or download_lta or download_m3z or download_mgh or download_mgz or download_mid or download_nofix or download_old or download_orig or download_pial or download_reg or download_smoothwm or download_sphere or download_stats or download_sulc or download_thickness or download_touch or download_txt or download_volume or download_white or download_xdebug_mris_calc or download_xfm:
             resource_list.append("DATA")
 
-        if not os.path.exists(destination):
-            os.makedirs(destination)
+        destination = Path(destination)
+        if not destination.exists():
+            destination.mkdir(parents=True, exist_ok=True)   
 
         for resource_name in resource_list:
-            folder_path = os.path.join(destination, session_label, assessor_id)
-            resource_folder_path = os.path.join(folder_path, resource_name)
+            cwd = Path.cwd()
+            folder_path = Path(cwd, destination, session_label, assessor_id)
+            destination_path = Path(destination)
+            resource_folder_path = Path(folder_path, resource_name)
 
             zip_filename = assessor_id + '_' + resource_name + '.zip'
+            zip_filepath = Path(destination, zip_filename)
 
-            download_result_code = download_resource_contents(experiment_id, assessor_id, destination, zip_filename, resource_name)
+            download_result_code = download_resource_contents(experiment_id, assessor_id, destination_path, zip_filename, resource_name)
 
-            if (str(download_result_code) == "200") and zipfile.is_zipfile(os.path.join(destination, zip_filename)):
-                print(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.")        
+            if (str(download_result_code) == "200") and zipfile.is_zipfile(zip_filepath):
+                print(assessor_id + ": Got valid zip file " + str(zip_filepath) + ". Continuing.")        
                 if create_logs:
-                    log_file.write(assessor_id + ": Got valid zip file " + os.path.join(destination, zip_filename) + ". Continuing.\n")
+                    log_file.write(assessor_id + ": Got valid zip file " + str(zip_filepath) + ". Continuing.\n")
                 # Make the DATA/SNAPSHOTS/LOGS dir if it doesn't exist yet
-                if not os.path.exists(resource_folder_path):
-                    os.makedirs(resource_folder_path)
-                extract_requested_files(os.path.join(destination, zip_filename), resource_folder_path, resource_name)
-                os.remove(os.path.join(destination, zip_filename))
+                if not resource_folder_path.exists():
+                    resource_folder_path.mkdir(parents=True, exist_ok=True)
+                extract_requested_files(zip_filepath, resource_folder_path, resource_name)
+                os.remove(zip_filepath)
                 if create_logs:
                     log_file.write(assessor_id + ": Successfully unzipped zip file for resource " + resource_name + ".\n")
                     log_file_catalog.write(experiment_id + "," + session_label + "," + assessor_id + ",Files from " + resource_name + " resource downloaded successfully.\n")
@@ -576,7 +587,7 @@ while num_password_retries <= 3:
     num_password_retries = num_password_retries + 1
 
     if user is None:
-        user = raw_input("Enter your username for " + site + ": ")
+        user = input("Enter your username for " + site + ": ")
     if password is None:
         password = getpass.getpass("Enter your password for " + site + ": ")
 
@@ -617,7 +628,7 @@ while num_password_retries <= 3:
                         log_file.write("Getting started with FreeSurfer " + assessor_id + ".\n")
 
                     # download the single Freesurfer based on assessor ID
-                    download_one_fs(assessor_id)
+                    download_one_fs(assessor_id, destination)
 
                     if create_logs:
                         log_file.write("Done with FreeSurfer " + assessor_id + ".\n")
@@ -630,7 +641,7 @@ while num_password_retries <= 3:
                 log_file.write("Getting started with FreeSurfer " + assessor_id + ".\n")
 
             # download the single Freesurfer based on assessor ID
-            download_one_fs(assessor_id)
+            download_one_fs(assessor_id, destination)
 
             if create_logs:
                 log_file.write("Done with FreeSurfer " + assessor_id + ".\n")
