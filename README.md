@@ -13,11 +13,9 @@
 <br>
 <br>
 
-# KARI data freeze scripts overview
+# KARI data freeze download scripts overview
 This repository contains scripts to download Knight Alzheimer Research Institute (KARI) raw imaging scans, freesurfer files, and PUP files from the XNAT platform, CNDA. These scripts are specifically designed for the collaborators who have access to the KARI Master Data Freeze project on the CNDA. All scripts were written using python 3.
 
-<br>
-<br>
 
 # Prerequisites - Please Read
 ## Python 3
@@ -25,6 +23,7 @@ This repository contains scripts to download Knight Alzheimer Research Institute
 In order to run these scripts you will need to have Python 3 installed on your machine. 
 
 Windows users may want to use [Anaconda](https://www.anaconda.com/products/individual#Downloads). Detailed instructions on how to run this script using Anaconda on Windows will be posted soon.
+
 
 ## Python packages
 
@@ -52,8 +51,6 @@ XNAT tokens are a secure way of authenticating your request so that XNAT can det
 
 More detailed documentation can be found here: https://wiki.xnat.org/documentation/how-to-use-xnat/generating-an-alias-token-for-scripted-authentication
 
-<br>
-<br>
 
 # General instructions on running these scripts
 
@@ -69,22 +66,18 @@ More detailed documentation can be found here: https://wiki.xnat.org/documentati
 
 6. Go into your command line. On Windows you can use a terminal system like MobaXTerm. If you're using a Mac you can use Terminal. Make sure you are not running the script while logged in as the root user. Change directories to the folder your scripts and empty folder are in using the `cd` command.
 
-<br>
-<br>
 
 # Downloading MR and PET scan files
 **download_scans/download_scans_by_scan_type.sh**
 
 This script downloads all or a specificed type of MR and PET. 
 
-<br>
 
 **General Usage:**
 ```
 python3 download_scans.py <site> <destination_dir> -c <session_ids.csv> -t <requested_scan_types.csv> -u <alias> -p <secret>
 ```
 
-<br>
 
 **Required inputs:**
 
@@ -100,7 +93,6 @@ python3 download_scans.py <site> <destination_dir> -c <session_ids.csv> -t <requ
   
 `<secret>`: Obtain secret token using the instructions under "XNAT token"
 
- <br>
  
 **Optional Flags**
 
@@ -110,7 +102,6 @@ Include the `--create-logs` flag to create output logs. Two logs will be created
 
 If you only have one session you need to download scans for, you can use the `-i` or `--id` flag instead of including `-c <session_ids.csv>`. Specify it like this: `-i CNDA_E123456`
 
- <br>
  
 **Example Usage**
 
@@ -144,7 +135,6 @@ where out_dir is your output directory path and ALIAS and SECRET below are repla
 ```
 python3 download_scans.py https://cnda.wustl.edu out_dir -c scans_to_download.csv -t requested_scan_types.csv -u ALIAS -p SECRET
 ```
-<br>
 
 **Script output**
 
@@ -158,8 +148,6 @@ If the `--create-logs` flag is included when running the script, the following l
 - File `download_scans_${timestamp}.log`  that contains all output from the script.
 - File `download_scans_catalog_${timestamp}.csv` - contains a list of all MR or PET Session IDs in your original list, the scans that were downloaded, and their final download status.
 
-<br>
-<br>
 
 # Downloading FreeSurfer files
 **download_freesurfer/download_freesurfer.py**
@@ -173,7 +161,6 @@ This script downloads all or a specific type of FreeSurfer files.
 python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias> -p <secret>
 ```
 
-<br>
 
 **Required inputs:**
 
@@ -187,7 +174,6 @@ python download_freesurfer.py <site> <destination_dir> -c <fs_ids.csv> -u <alias
   
 `<secret>`: Obtain secret token using the instructions under "XNAT token"
 
- <br>
  
 **Optional Flags**
 
@@ -283,8 +269,7 @@ Include any of the following optional flags to only download particular filetype
 
 `--download-xdebug_mris_calc` Download .xdebug_mris_calc files
 
-<br>
- 
+
 **Example Usage**
 
 1. Create a csv containing FreeSurfer IDs (FS_ID) without a header.
@@ -311,7 +296,6 @@ where out_dir is your output directory path and ALIAS and SECRET are your alias 
 python download_freesurfer.py https://cnda.wustl.edu out_dir -c download_freesurfer_list.csv -u ALIAS -p SECRET --download-mgz --download-pial
 ```
 
-<br>
 
 **Script output**
 
@@ -335,22 +319,18 @@ If the `--create-logs` flag is included when running the script, the following l
 - File `download_freesurfer_catalog_${timestamp}.csv` - contains a list of all FreeSurfer IDs in your original list and their final download status.
 
 
-<br>
-<br>
 
 # Downloading PUP files
 **download_pup/download_pup.py**
 
 This script downloads all or a specific type of PUP files.
 
-<br>
 
 **General Usage:**
 ```
 python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <secret>
 ```
 
-<br>
 
 **Required inputs:**
 
@@ -364,7 +344,6 @@ python download_pup.py <site> <destination_dir> -c <pup_ids.csv> -u <alias> -p <
   
 `<secret>`: Obtain secret token using the instructions under "XNAT token"
 
- <br>
  
 **Optional Flags**
 
@@ -416,7 +395,6 @@ Include any of the following optional flags to only download particular filetype
 
 `--download-wmparc` Download all files containing "wmparc" in the name
 
-<br>
  
 **Example Usage**
 
@@ -447,7 +425,6 @@ where out_dir is your output directory path and ALIAS and SECRET are your alias 
 python download_pup.py https://cnda.wustl.edu out_dir -c download_pup_list.csv -u ALIAS -p SECRET --download-4dfp
 ```
 
-<br>
 
 **Script output**
 
